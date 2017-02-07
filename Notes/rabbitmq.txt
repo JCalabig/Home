@@ -1,0 +1,18 @@
+# http://blog.dushin.net/2014/01/running-rabbitmq-on-raspberripi/
+# http://www.pihomeserver.fr/en/2013/10/02/raspberry-pi-home-server-installer-gestionnaire-messages-rabbitmq/
+# https://www.rabbitmq.com/management.html
+
+echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install rabbitmq-server
+rabbitmq-plugins enable rabbitmq_management
+rabbitmq-server service restart
+
+# http://<IP of the raspberry>:15672/#/
+# http://stackoverflow.com/questions/23669780/rabbitmq-3-3-1-can-not-login-with-guest-guest
+
+sudo rabbitmqctl add_user admin YOUR_PASSWORD
+sudo rabbitmqctl set_user_tags admin administrator
+sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
+
