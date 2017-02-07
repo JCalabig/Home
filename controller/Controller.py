@@ -8,7 +8,6 @@ from rabbitmq.MessageQueue import MessageQueue
 class Controller:
     def __init__(self, machine_id, controlled_states):
         self._machine_id = machine_id
-        self._connection = None
         self._message_queue = MessageQueue(self._machine_id, send_key="commands", on_send=self.on_send,
                                            receive_key="events", on_receive=self.on_receive)
         self._controlled_states = controlled_states
@@ -28,7 +27,7 @@ class Controller:
 
     def on_receive(self, event_payload, routing_key):
         if routing_key != "events":
-            logging.info("ignoring %s", routing_key )
+            logging.info("ignoring %s", routing_key)
             return
         event_payload.setdefault(TYPE, EVENT)
         event_payload.setdefault(EVENT, None)
