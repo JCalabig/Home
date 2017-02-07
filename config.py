@@ -1,10 +1,6 @@
 from constants import *
 
 
-queue_server = "localhost"
-username = "test"
-password = "test"
-
 alarm_actions = [
     {
         ACTION: SEND,
