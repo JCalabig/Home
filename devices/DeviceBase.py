@@ -8,10 +8,12 @@ class DeviceBase:
         self.device_id = device_id
         self.device_manager = device_manager
         self.device_config = device_config
-        self.can_send = True
+        # don't send unless the Controller asks it to send
+        self.can_send = False
 
-    def send_payload(self, payload, payload_type=EVENT):
+    def send_payload(self, payload):
         if self.can_send is False:
+            logging.info("send_payload: will not send. can_send == False")
             return
         payload[FROM] = self.device_id
         payload[TIMESTAMP] = datetime.datetime.now()

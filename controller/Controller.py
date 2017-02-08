@@ -5,6 +5,8 @@ from constants import *
 from rabbitmq.MessageQueue import MessageQueue
 
 
+# controller to have a periodic thread to ask for DHT11 data!
+
 class Controller:
     def __init__(self, machine_id, controlled_states):
         self._machine_id = machine_id

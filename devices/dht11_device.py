@@ -6,11 +6,11 @@ import logging
 from utils.Countdown import CountdownTimer
 from DeviceBase import DeviceBase
 
+# dht 11 power pin to be just +3.3VCC
 
 class Dht11Device(DeviceBase):
     def __init__(self, device_id, device_manager, device_config):
         super(self.__class__, self).__init__(device_id, device_manager, device_config)
-
         gpio.setup(device_config["powerPin"], gpio.OUT)
         gpio.output(device_config["powerPin"], True)
         self._dht11 = dht11.DHT11(pin=device_config["inputPin"])
