@@ -16,7 +16,7 @@ class DeviceBase:
             logging.info("send_payload: will not send. can_send == False")
             return
         payload[FROM] = self.device_id
-        payload[TIMESTAMP] = datetime.datetime.now()
+        payload[TIMESTAMP] = str(datetime.datetime.now())
         self.device_manager.send(payload)
 
     def pause_events(self):

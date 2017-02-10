@@ -8,8 +8,8 @@ from DeviceBase import DeviceBase
 
 class KitchenLight(DeviceBase):
     def __init__(self, device_id, device_manager, device_config):
-        super(self.__class__, self).__init__(device_id, device_manager, device_config)
-        for pin in self._device_config["relayPins"]:
+        DeviceBase.__init__(self, device_id, device_manager, device_config)
+        for pin in self.device_config["relayPins"]:
             gpio.setup(pin, gpio.OUT)
             gpio.output(pin, gpio.HIGH)
         self._timer = CountdownTimer(10, self.off, name="kitchen light")
@@ -50,12 +50,12 @@ class KitchenLight(DeviceBase):
 
     def off(self):
         logging.debug("kitchen lights off")
-        for pin in self._device_config["relayPins"]:
+        for pin in self.device_config["relayPins"]:
             gpio.output(pin, gpio.HIGH)
 
     def on(self):
         logging.debug("kitchen lights on")
-        for pin in self._device_config["relayPins"]:
+        for pin in self.device_config["relayPins"]:
             gpio.output(pin, gpio.LOW)
         self._timer.reset()
 

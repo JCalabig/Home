@@ -13,15 +13,16 @@ class Controller:
         self._message_queue = MessageQueue(self._machine_id, send_key="commands", on_send=self.on_send,
                                            receive_key="events", on_receive=self.on_receive)
         self._controlled_states = controlled_states
-        self._timer = CountdownTimer(10, self.get_temp_readings, name="controller")
+        self._timer = CountdownTimer(60, self.get_temp_readings, name="controller")
         self._timer.start()
 
     def get_temp_readings(self):
-        self.send({
-            TYPE: COMMAND,
-            DEVICE: "dht11",
-            OP_CODE: "read"
-        })
+        #self.send({
+        #    TYPE: COMMAND,
+        #    DEVICE: "dht11",
+        #    OP_CODE: "read"
+        #})
+        pass
 
     def on_send(self, event):
         # find all interested devices!!

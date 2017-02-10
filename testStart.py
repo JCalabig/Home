@@ -7,7 +7,7 @@ connection = Connection(queue_server, username, password)
 sender = Sender(connection, "controller1", "events")
 sender.send({
     TO: "controller1",
-    EVENT:"away"
+    EVENT:"reset"
     })
 sender.un_initialize()
 connection.un_initialize()
