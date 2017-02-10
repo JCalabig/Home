@@ -1,6 +1,6 @@
 import copy
 import logging
-
+from utils.Countdown import CountdownTimer
 from constants import *
 from rabbitmq.MessageQueue import MessageQueue
 
@@ -13,6 +13,15 @@ class Controller:
         self._message_queue = MessageQueue(self._machine_id, send_key="commands", on_send=self.on_send,
                                            receive_key="events", on_receive=self.on_receive)
         self._controlled_states = controlled_states
+        self._timer = CountdownTimer(10, self.get_temp_readings, name="controller")
+        self._timer.start()
+
+    def get_temp_readings(self):
+        self.send({
+            TYPE: COMMAND,
+            DEVICE: "dht11",
+            OP_CODE: "read"
+        })
 
     def on_send(self, event):
         # find all interested devices!!
@@ -25,6 +34,8 @@ class Controller:
         self._message_queue.block_receive()
 
     def cleanup(self):
+        self._timer.quit()
+        self._timer.join()
         self._message_queue.cleanup()
 
     def on_receive(self, event_payload, routing_key):
@@ -66,7 +77,3 @@ class Controller:
                 self.send(payload)
         except:
             logging.info("Exception", exc_info=1)
-
-
-if __name__ == "__main__":
-    pass
