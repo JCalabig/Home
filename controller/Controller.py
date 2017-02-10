@@ -42,16 +42,21 @@ class Controller:
         if routing_key != "events":
             logging.info("ignoring %s", routing_key)
             return
+        self.set_payload_defaults(event_payload)
+        if event_payload[TARGET] != self._machine_id:
+            return
+        if event_payload[TYPE] == EVENT:
+            self.process_event(event_payload)
+        else:
+            logging.info("%s will be handled separately", event_payload[TYPE])
+
+    def set_payload_defaults(self, event_payload):
         event_payload.setdefault(TYPE, EVENT)
         event_payload.setdefault(EVENT, None)
         event_payload.setdefault(TARGET, self._machine_id)
-        target = event_payload[TARGET]
-        if target != self._machine_id:
-            return
+
+    def process_event(self, event_payload):
         logging.info("... on event %s", str(event_payload))
-        if event_payload[TYPE] != EVENT:
-            logging.info("%s skipped", event_payload[TYPE])
-            return
         for controlled_state in self._controlled_states:
             next_state, actions = controlled_state.evaluate(event_payload)
             for action in actions:
