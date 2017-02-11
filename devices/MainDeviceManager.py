@@ -21,7 +21,5 @@ manager = DeviceManager("iot1", {
 })
 try:
     manager.block_receive()
-except:
+except Exception:
     logging.info("Exception", exc_info=1)
-finally:
-    manager.cleanup()

@@ -13,7 +13,7 @@ class TimedBuzzer:
         self._timer = CountdownTimer(2, self.off, name="timed buzzer")
         self._timer.start()
 
-    def un_init(self):
+    def cleanup(self):
         self._timer.quit()
         self._timer.join()
         gpio.output(self._device_config["pin"], False)
@@ -35,7 +35,7 @@ buzzer_config = {
     # mandatory
     DEVICE_OBJECT: None,
     CONSTRUCTOR: TimedBuzzer,
-    DE_CONSTRUCTOR: TimedBuzzer.un_init
+    DE_CONSTRUCTOR: TimedBuzzer.cleanup
 }
 
 

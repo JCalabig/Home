@@ -12,28 +12,26 @@ class Dht11Device(DeviceBase):
         # can always send data to controller
         self.can_send = True
 
-    def un_init(self):
+    def cleanup(self):
         self._dht11 = None
 
     def read(self):
         logging.info("dht11 read")
-        try:
-            while True:
-                result = self._dht11.read()
-                if result.is_valid():
-                    self.send_payload({
-                        TYPE: DATA,
-                        "tempC": result.temperature,
-                        "tempF": result.temperature*1.8 + 32.0,
-                        "humidity": result.humidity,
-                        "optionalMessage": None
-                    })
-                    return
-                else:
-                    logging.info("Retrying")
-                time.sleep(1)
-        except KeyboardInterrupt:
-            logging.info("KeyboardInterrupt")
+        while True:
+            result = self._dht11.read()
+            if result.is_valid():
+                self.send_payload({
+                    TYPE: DATA,
+                    "tempC": result.temperature,
+                    "tempF": result.temperature * 1.8 + 32.0,
+                    "humidity": result.humidity,
+                    "optionalMessage": None
+                })
+                return
+            else:
+                logging.info("Retrying")
+            time.sleep(1)
+
 
 dht11_config = {
     "inputPin": 22,
@@ -43,7 +41,7 @@ dht11_config = {
     # mandatory
     DEVICE_OBJECT: None,
     CONSTRUCTOR: Dht11Device,
-    DE_CONSTRUCTOR: Dht11Device.un_init
+    DE_CONSTRUCTOR: Dht11Device.cleanup
 }
 
 

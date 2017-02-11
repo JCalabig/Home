@@ -19,12 +19,12 @@ class Sender:
         try:
             if self._on_send is not None:
                 self._on_send(payload)
-        except:
+        except Exception:
             logging.critical("Exception", exc_info=1)
-        confirm = self._connection.channel.basic_publish(self._exchange,
-                                                         self._routing_key,
-                                                         json.dumps(payload, ensure_ascii=False),
-                                                         self._properties)
+        self._connection.channel.basic_publish(self._exchange,
+                                               self._routing_key,
+                                               json.dumps(payload),
+                                               self._properties)
         logging.info(">>>>>>>>>>>>>>>>>>>>>>>>>sending: (key:%s)%s", self._routing_key, str(payload))
 
     def un_initialize(self):

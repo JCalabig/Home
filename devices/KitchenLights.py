@@ -19,7 +19,7 @@ class KitchenLight(DeviceBase):
         self._motion_sensor.when_motion = self._when_motion
         self._motion_sensor.when_no_motion = self._when_no_motion
 
-    def un_init(self):
+    def cleanup(self):
         self._timer.quit()
         self._timer.join()
         for pin in self.device_config["relayPins"]:
@@ -44,9 +44,6 @@ class KitchenLight(DeviceBase):
     def _when_no_motion(self):
         logging.debug("motion stopped")
         self._motion_sensor_led.off()
-        # self.send_event({
-        #    EVENT: "motionStopped"
-        # })
 
     def off(self):
         logging.debug("kitchen lights off")
@@ -72,7 +69,7 @@ kitchen_lights_config = {
     # mandatory
     DEVICE_OBJECT: None,
     CONSTRUCTOR: KitchenLight,
-    DE_CONSTRUCTOR: KitchenLight.un_init
+    DE_CONSTRUCTOR: KitchenLight.cleanup
 }
 
 

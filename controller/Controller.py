@@ -33,6 +33,7 @@ class Controller:
 
     def block_receive(self):
         self._message_queue.block_receive()
+        self.cleanup()
 
     def cleanup(self):
         self._timer.quit()
@@ -81,5 +82,5 @@ class Controller:
                 payload = copy.deepcopy(action)
                 del payload[ACTION]
                 self.send(payload)
-        except:
+        except Exception:
             logging.info("Exception", exc_info=1)

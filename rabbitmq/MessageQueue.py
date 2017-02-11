@@ -7,8 +7,8 @@ from config import queue_server, username, password
 class MessageQueue:
     def __init__(self, machine_id, send_key, on_send, receive_key, on_receive):
         self._connection = Connection(queue_server, username, password)
-        self.sender = Sender(self._connection, machine_id, send_key, on_send)
-        self.receiver = Receiver(self._connection, machine_id, receive_key, on_receive)
+        self.sender = Sender(self._connection, machine_id, send_key, exchange=send_key, on_send=on_send)
+        self.receiver = Receiver(self._connection, machine_id, receive_key, exchange=receive_key, on_receive=on_receive)
 
     def send(self, payload):
         self.sender.send(payload)

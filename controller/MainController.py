@@ -42,9 +42,8 @@ try:
         EVENT: BEGIN
         }, "events")
     controller.block_receive()
-except:
+except Exception:
     logging.info("Exception", exc_info=1)
 finally:
     lcd_thread.quit()
-    controller.cleanup()
 
