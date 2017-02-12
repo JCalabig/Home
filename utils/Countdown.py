@@ -35,13 +35,13 @@ class CountdownTimer(threading.Thread):
             self._name, self._duration_seconds, self._sleep_interval)
         while not self._quit:
             time.sleep(self._sleep_interval)
+            lower_limit = -1 * self._sleep_interval
             with self._lock:
-                if self._counter <= 0:
-                    self._counter = -1
-                else:
-                    self._counter -= self._sleep_interval
+                self._counter -= self._sleep_interval
+                if self._counter < lower_limit * 2:
+                    self._counter = lower_limit* 2
             logging.debug("%s counter: %d", self._name, self._counter)
-            if self._action is not None and self._counter <= 0:
+            if self._action is not None and lower_limit <= self._counter <= 0:
                 logging.debug("%s performing action!", self._name)
                 self._action()
         logging.info("%s quit!", self._name)

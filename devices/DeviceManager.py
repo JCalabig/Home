@@ -42,9 +42,6 @@ class DeviceManager:
                 raise
 
     def on_receive(self, event, routing_key):
-        if routing_key != "commands":
-            logging.info("ignoring %s", routing_key)
-            return
         if event.get(TARGET, self._machine_id) != self._machine_id:
             return
         op_code = event[OP_CODE]
@@ -58,15 +55,3 @@ class DeviceManager:
             logging.error("op code not recognized: %s", op_code)
             return
         device_config[op_code](device_config[DEVICE_OBJECT])
-
-
-if __name__ == "__main__":
-    logging.root.setLevel(logging.INFO)
-    dm = DeviceManager("me")
-    try:
-        print ("test")
-    except:
-        logging.info("Exception", exc_info=1)
-    finally:
-        dm.cleanup()
-

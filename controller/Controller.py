@@ -13,16 +13,17 @@ class Controller:
         self._message_queue = MessageQueue(self._machine_id, send_key="commands",
                                            receive_key="events", on_receive=self.on_receive)
         self._controlled_states = controlled_states
-        self._timer = CountdownTimer(2, self.get_temp_readings, name="dht controller")
+        self._timer = CountdownTimer(60, self.get_temp_readings, name="dht controller")
         self._timer.start()
 
     def get_temp_readings(self):
-        #self.send({
-        #    TYPE: COMMAND,
-        #    DEVICE: "dht11",
-        #    OP_CODE: "read"
-        #})
-        pass
+        logging.info("getting temp readings")
+        self.send({
+            TYPE: COMMAND,
+            DEVICE: "dht11",
+            OP_CODE: "read"
+        })
+        self._timer.reset()
 
     def send(self, payload):
         self._message_queue.send(payload)
@@ -33,9 +34,6 @@ class Controller:
         self._timer.join()
 
     def on_receive(self, event_payload, routing_key):
-        if routing_key != "events":
-            logging.info("ignoring %s", routing_key)
-            return
         self.set_payload_defaults(event_payload)
         if event_payload[TARGET] != self._machine_id:
             return
