@@ -10,7 +10,7 @@ class Receiver:
         self._routing_key = routing_key
 
     def consume_callback(self, ch, method, properties, body):
-        logging.info("<<<<<<<<<<<<<<<<<<<<<< subscribe received: %s:%s %s, properties: {}",
+        logging.info("<<<<<<<<<<<<<<<<<<<<<< subscribe received: %s:%s %s, properties: %s",
                      method.routing_key, body, method.delivery_tag, str(properties))
         try:
             self._on_receive(json.loads(body), method.routing_key)
