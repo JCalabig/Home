@@ -1,7 +1,7 @@
 from constants import *
 
 
-queue_server = "localhost"
+queue_server = "192.168.1.17"
 username = "test"
 password = "test"
 

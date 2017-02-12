@@ -21,6 +21,8 @@ class Sender:
                 self._on_send(payload)
         except Exception:
             logging.critical("Exception", exc_info=1)
+        self._connection.channel.exchange_declare(exchange=self._exchange,
+                                                  type='direct', durable=True)
         self._connection.channel.basic_publish(self._exchange,
                                                self._routing_key,
                                                json.dumps(payload),

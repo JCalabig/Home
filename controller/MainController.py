@@ -7,7 +7,7 @@ import logging
 import threading
 import time
 
-from I2C_LCD.I2C_LCD_driver import lcd as display
+# from I2C_LCD.I2C_LCD_driver import lcd as display
 from config import home_monitor_config
 from constants import *
 from controller.Controller import Controller
@@ -35,9 +35,9 @@ class DisplayThread (threading.Thread):
 
 
 controller = Controller("controller1", [ControlledObject(home_monitor_config)])
-lcd_thread = DisplayThread()
+#lcd_thread = DisplayThread()
 try:
-    lcd_thread.start()
+    #lcd_thread.start()
     controller.on_receive({
         EVENT: BEGIN
         }, "events")
@@ -45,5 +45,6 @@ try:
 except Exception:
     logging.info("Exception", exc_info=1)
 finally:
-    lcd_thread.quit()
+    #lcd_thread.quit()
+    pass
 

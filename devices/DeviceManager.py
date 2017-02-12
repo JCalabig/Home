@@ -40,7 +40,6 @@ class DeviceManager:
             except Exception:
                 logging.error("Exception on un_initialize %s", device_name, exc_info=1)
                 raise
-        self._message_queue.cleanup()
 
     def on_receive(self, event, routing_key):
         if routing_key != "commands":

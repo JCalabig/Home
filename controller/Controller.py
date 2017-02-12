@@ -10,10 +10,10 @@ from rabbitmq.MessageQueue import MessageQueue
 class Controller:
     def __init__(self, machine_id, controlled_states):
         self._machine_id = machine_id
-        self._message_queue = MessageQueue(self._machine_id, send_key="commands", on_send=self.on_send,
+        self._message_queue = MessageQueue(self._machine_id, send_key="commands",
                                            receive_key="events", on_receive=self.on_receive)
         self._controlled_states = controlled_states
-        self._timer = CountdownTimer(60, self.get_temp_readings, name="controller")
+        self._timer = CountdownTimer(2, self.get_temp_readings, name="dht controller")
         self._timer.start()
 
     def get_temp_readings(self):
@@ -24,21 +24,13 @@ class Controller:
         #})
         pass
 
-    def on_send(self, event):
-        # find all interested devices!!
-        return
-
     def send(self, payload):
         self._message_queue.send(payload)
 
     def block_receive(self):
         self._message_queue.block_receive()
-        self.cleanup()
-
-    def cleanup(self):
         self._timer.quit()
         self._timer.join()
-        self._message_queue.cleanup()
 
     def on_receive(self, event_payload, routing_key):
         if routing_key != "events":
