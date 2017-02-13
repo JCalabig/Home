@@ -7,10 +7,8 @@ from DeviceBase import DeviceBase
 
 class Dht11Device(DeviceBase):
     def __init__(self, device_id, device_manager, device_config):
-        DeviceBase.__init__(self, device_id, device_manager, device_config)
+        DeviceBase.__init__(self, device_id, device_manager, device_config, begin_send=True)
         self._dht11 = dht11.DHT11(pin=device_config["inputPin"])
-        # can always send data to controller
-        self.can_send = True
 
     def cleanup(self):
         self._dht11 = None
@@ -43,5 +41,3 @@ dht11_config = {
     CONSTRUCTOR: Dht11Device,
     DE_CONSTRUCTOR: Dht11Device.cleanup
 }
-
-
