@@ -11,7 +11,7 @@ class KitchenLight(DeviceBase):
         DeviceBase.__init__(self, device_id, device_manager, device_config)
         for pin in self.device_config["relayPins"]:
             gpio.setup(pin, gpio.OUT)
-            gpio.output(pin, gpio.HIGH)
+            gpio.output(pin, gpio.LOW)
         self._timer = CountdownTimer(10, self.off, name="kitchen light")
         self._timer.start()
         self._motion_sensor_led = LED(device_config["pirLedPin"])
@@ -48,12 +48,12 @@ class KitchenLight(DeviceBase):
     def off(self):
         logging.debug("kitchen lights off")
         for pin in self.device_config["relayPins"]:
-            gpio.output(pin, gpio.HIGH)
+            gpio.output(pin, gpio.LOW)
 
     def on(self):
         logging.debug("kitchen lights on")
         for pin in self.device_config["relayPins"]:
-            gpio.output(pin, gpio.LOW)
+            gpio.output(pin, gpio.HIGH)
         self._timer.reset()
 
 kitchen_lights_config = {

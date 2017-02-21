@@ -4,7 +4,7 @@ from constants import *
 
 
 class DeviceBase:
-    def __init__(self, device_id, device_manager, device_config, send_max=1024, begin_send=False):
+    def __init__(self, device_id, device_manager, device_config, send_max=512, begin_send=False):
         self.device_id = device_id
         self.device_manager = device_manager
         self.device_config = device_config
@@ -13,6 +13,7 @@ class DeviceBase:
 
     def send_payload(self, payload):
         self._send_count -= 1
+        logging.info("send_payload: send_count remaining = {}".format(self._send_count))
         if self._send_count <= 0:
             self._send_count = -1
             logging.info("send_payload: will not send.")
