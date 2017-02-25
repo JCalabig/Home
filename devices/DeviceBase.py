@@ -12,12 +12,12 @@ class DeviceBase:
         self._send_count = self._max_send if begin_send is True else 0
 
     def send_payload(self, payload):
-        self._send_count -= 1
         logging.info("send_payload: send_count remaining = {}".format(self._send_count))
         if self._send_count <= 0:
             self._send_count = -1
             logging.info("send_payload: will not send.")
             return
+        self._send_count -= 1
         payload[FROM] = self.device_id
         payload[TIMESTAMP] = str(datetime.datetime.now())
         self.device_manager.send(payload)

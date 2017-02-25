@@ -3,7 +3,7 @@ import RPi.GPIO as gpio
 
 from DeviceManager import DeviceManager
 from devices.TimedBuzzer import buzzer_config
-from devices.KitchenLights import kitchen_lights_config
+from devices.MotionDetector import motion_detector_config
 from devices.dht11_device import dht11_config
 
 
@@ -16,7 +16,7 @@ gpio.cleanup()
 
 manager = DeviceManager("iot1", {
     "dht11": dht11_config,
-    "kitchenLights1": kitchen_lights_config,
+    "kitchenLights1": motion_detector_config,
     "buzzer1": buzzer_config
 })
 try:
