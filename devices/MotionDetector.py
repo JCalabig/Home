@@ -9,16 +9,19 @@ from DeviceBase import DeviceBase
 class MotionDetector(DeviceBase):
     _RELAY_DISCONNECT = gpio.LOW
     _RELAY_CONNECT = gpio.HIGH
+    _RELAY_PINS = [23, 24]
+    _MOTION_SENSOR_INPUT_PIN = 4
+    _LIGHT_PIN = 26
 
     def __init__(self, device_id, device_manager, device_config):
         DeviceBase.__init__(self, device_id, device_manager, device_config)
-        for pin in self.device_config["relayPins"]:
+        for pin in MotionDetector._RELAY_PINS:
             gpio.setup(pin, gpio.OUT)
             gpio.output(pin, MotionDetector._RELAY_DISCONNECT)
         self._timer = CountdownTimer(10, self.relay_disconnected, name="MotionDetector")
         self._timer.start()
-        self._light = LED(device_config["pirLedPin"])
-        self._sensor = MotionSensor(device_config["pirInputPin"])
+        self._light = LED(MotionDetector._LIGHT_PIN)
+        self._sensor = MotionSensor(MotionDetector._MOTION_SENSOR_INPUT_PIN)
         self._sensor.when_motion = self._when_motion
         self._sensor.when_no_motion = self._when_no_motion
 
@@ -49,23 +52,20 @@ class MotionDetector(DeviceBase):
 
     def relay_disconnected(self):
         Log.debug("MotionDetector relay_disconnected")
-        for pin in self.device_config["relayPins"]:
+        for pin in MotionDetector._RELAY_PINS:
             gpio.output(pin, MotionDetector._RELAY_DISCONNECT)
 
     def relay_connected(self):
         Log.debug("MotionDetector relay_connected")
-        for pin in self.device_config["relayPins"]:
+        for pin in MotionDetector._RELAY_PINS:
             gpio.output(pin, MotionDetector._RELAY_CONNECT)
         self._timer.reset()
 
 
 motion_detector_config = {
-    "relayPins": [23, 24],
     "off": MotionDetector.relay_disconnected,
     "on": MotionDetector.relay_connected,
 
-    "pirInputPin": 4,
-    "pirLedPin": 26,
     "pauseEvents": MotionDetector.pause_events,
     "resumeEvents": MotionDetector.resume_events,
 
