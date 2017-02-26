@@ -1,5 +1,5 @@
 import copy
-import logging
+from utils.DefaultLogger import Log
 from utils.Countdown import CountdownTimer
 from constants import *
 from rabbitmq.MessageQueue import MessageQueue
@@ -17,7 +17,7 @@ class Controller:
         self._timer.start()
 
     def get_temp_readings(self):
-        logging.info("getting temp readings")
+        Log.info("getting temp readings")
         self.send({
             TYPE: COMMAND,
             DEVICE: "dht11",
@@ -40,7 +40,7 @@ class Controller:
         if event_payload[TYPE] == EVENT:
             self.process_event(event_payload)
         else:
-            logging.info("%s will be handled separately", event_payload[TYPE])
+            Log.info("%s will be handled separately", event_payload[TYPE])
 
     def set_payload_defaults(self, event_payload):
         event_payload.setdefault(TYPE, EVENT)
@@ -48,29 +48,29 @@ class Controller:
         event_payload.setdefault(TARGET, self._machine_id)
 
     def process_event(self, event_payload):
-        logging.info("... on event %s", str(event_payload))
+        Log.info("... on event %s", str(event_payload))
         for controlled_state in self._controlled_states:
             next_state, actions = controlled_state.evaluate(event_payload)
             for action in actions:
                 self.do_action(action, controlled_state, event_payload)
             if next_state is not None:
                 controlled_state.state = next_state
-            logging.info("state after actions: %s, mode: %s after event %s",
-                         controlled_state.state, controlled_state.mode, str(event_payload))
+            Log.info("state after actions: %s, mode: %s after event %s",
+                     controlled_state.state, controlled_state.mode, str(event_payload))
 
     def do_action(self, action, controlled_state, event_payload):
         name = action[ACTION]
-        logging.info("performing action: {} on event {}".format(name, str(event_payload)))
+        Log.info("performing action: {} on event {}".format(name, str(event_payload)))
         try:
             if name == SET_MODE_AWAY:
                 controlled_state.mode = AWAY
-                logging.info("set mode: away")
+                Log.info("set mode: Away")
             elif name == SET_MODE_HOME:
                 controlled_state.mode = HOME
-                logging.info("set mode: Home")
+                Log.info("set mode: Home")
             elif name == SEND:
                 payload = copy.deepcopy(action)
                 del payload[ACTION]
                 self.send(payload)
         except Exception:
-            logging.info("Exception", exc_info=1)
+            Log.info("Exception", exc_info=1)

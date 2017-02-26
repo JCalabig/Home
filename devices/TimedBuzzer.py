@@ -1,5 +1,5 @@
 import RPi.GPIO as gpio
-import logging
+from utils.DefaultLogger import Log
 from constants import *
 from utils.Countdown import CountdownTimer
 
@@ -19,13 +19,14 @@ class TimedBuzzer:
         gpio.output(self._device_config["pin"], False)
 
     def off(self):
-        logging.info("buzzer off")
+        Log.info("buzzer off")
         gpio.output(self._device_config["pin"], False)
 
     def on(self):
-        logging.info("buzzer on")
+        Log.info("buzzer on")
         gpio.output(self._device_config["pin"], True)
         self._timer.reset()
+
 
 buzzer_config = {
     "pin": 27,
@@ -37,5 +38,3 @@ buzzer_config = {
     CONSTRUCTOR: TimedBuzzer,
     DE_CONSTRUCTOR: TimedBuzzer.cleanup
 }
-
-

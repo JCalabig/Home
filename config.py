@@ -1,6 +1,5 @@
 from constants import *
 
-
 queue_server = "192.168.1.17"
 username = "test"
 password = "test"
@@ -25,11 +24,11 @@ home_monitor_config = [
         STATE: BEGIN,
         NEXT_STATE: NORMAL,
         ACTIONS: [{
-                ACTION: SEND,
-                TYPE: COMMAND,
-                DEVICE: "kitchenLights1",
-                OP_CODE: "pauseEvents"
-            }]
+            ACTION: SEND,
+            TYPE: COMMAND,
+            DEVICE: "kitchenLights1",
+            OP_CODE: "pauseEvents"
+        }]
     },
     {
         STATE: ELEVATED,

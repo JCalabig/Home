@@ -1,4 +1,4 @@
-import logging
+from utils.DefaultLogger import Log
 from rabbitmq.Connection import Connection
 from rabbitmq.Receiver import Receiver
 from rabbitmq.Sender import Sender
@@ -27,6 +27,5 @@ class MessageQueue:
         try:
             self.receiver.block_receive()
         except KeyboardInterrupt:
-            logging.info("MessageQueue got KeyboardInterrupt")
+            Log.info("MessageQueue got KeyboardInterrupt")
         self.cleanup()
-

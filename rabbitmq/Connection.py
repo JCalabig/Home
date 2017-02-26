@@ -1,4 +1,5 @@
-import pika, logging
+import pika
+from utils.DefaultLogger import Log
 
 
 class Connection:
@@ -15,11 +16,10 @@ class Connection:
             self.channel = self._connection.channel()
             self.channel.confirm_delivery()
         except:
-            logging.info("Exception", exc_info=1)
+            Log.info("Exception", exc_info=1)
 
     def un_initialize(self):
         self.channel.close()
         self.channel = None
         self._connection.close()
         self._connection = None
-

@@ -1,5 +1,5 @@
 import datetime
-import logging
+from utils.DefaultLogger import Log
 from constants import *
 
 
@@ -12,10 +12,10 @@ class DeviceBase:
         self._send_count = self._max_send if begin_send is True else 0
 
     def send_payload(self, payload):
-        logging.info("send_payload: send_count remaining = {}".format(self._send_count))
+        Log.info("send_payload: send_count remaining = {}".format(self._send_count))
         if self._send_count <= 0:
             self._send_count = -1
-            logging.info("send_payload: will not send.")
+            Log.info("send_payload: will not send.")
             return
         self._send_count -= 1
         payload[FROM] = self.device_id
@@ -23,10 +23,9 @@ class DeviceBase:
         self.device_manager.send(payload)
 
     def pause_events(self):
-        logging.info("pause_events")
+        Log.info("pause_events")
         self._send_count = 0
 
     def resume_events(self):
-        logging.info("resume_events")
+        Log.info("resume_events")
         self._send_count = self._max_send
-

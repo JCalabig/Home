@@ -1,8 +1,5 @@
-import logging
-from constants import EVENT
+from DefaultLogger import Log
 import threading, datetime, time
-
-logging.root.setLevel(logging.INFO)
 
 
 class CountdownTimer(threading.Thread):
@@ -17,8 +14,8 @@ class CountdownTimer(threading.Thread):
         self._lock = threading.Lock()
 
     def reset(self):
-        logging.info("%s(duration %d) reset! (sleeping every %d secs)",
-                     self._name, self._duration_seconds, self._sleep_interval)
+        Log.info("%s(duration %d) reset! (sleeping every %d secs)",
+                 self._name, self._duration_seconds, self._sleep_interval)
         with self._lock:
             self._counter = self._duration_seconds
 
@@ -31,28 +28,28 @@ class CountdownTimer(threading.Thread):
             self.join()
 
     def run(self):
-        logging.info("%s(duration %d) run! (sleeping every %d secs)",
-            self._name, self._duration_seconds, self._sleep_interval)
+        Log.info("%s(duration %d) run! (sleeping every %d secs)",
+                 self._name, self._duration_seconds, self._sleep_interval)
         while not self._quit:
             time.sleep(self._sleep_interval)
             lower_limit = -1 * self._sleep_interval
             with self._lock:
                 self._counter -= self._sleep_interval
                 if self._counter < lower_limit * 2:
-                    self._counter = lower_limit* 2
-            logging.debug("%s counter: %d", self._name, self._counter)
+                    self._counter = lower_limit * 2
+            Log.debug("%s counter: %d", self._name, self._counter)
             if self._action is not None and lower_limit <= self._counter <= 0:
-                logging.debug("%s performing action!", self._name)
+                Log.debug("%s performing action!", self._name)
                 self._action()
-        logging.info("%s quit!", self._name)
+        Log.info("%s quit!", self._name)
+
 
 if __name__ == "__main__":
-    logging.root.setLevel(logging.INFO)
     t = CountdownTimer(5, CountdownTimer.quit, sleep_interval=1)
     try:
         t.start()
         t.join()
     except:
-        logging.info("Exception", exc_info=1)
+        Log.info("Exception", exc_info=1)
     finally:
         t.quit()
