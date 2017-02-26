@@ -1,4 +1,4 @@
-import logging
+from utils.DefaultLogger import Log
 import RPi.GPIO as gpio
 
 from DeviceManager import DeviceManager
@@ -6,8 +6,6 @@ from devices.TimedBuzzer import buzzer_config
 from devices.MotionDetector import motion_detector_config
 from devices.dht11_device import dht11_config
 
-
-logging.root.setLevel(logging.INFO)
 
 # initialize gpio
 gpio.setwarnings(False)
@@ -22,4 +20,4 @@ manager = DeviceManager("iot1", {
 try:
     manager.block_receive()
 except Exception:
-    logging.info("Exception", exc_info=1)
+    Log.error("Exception", exc_info=1)
