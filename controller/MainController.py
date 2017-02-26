@@ -33,10 +33,10 @@ class DisplayThread(threading.Thread):
         self.lcd.lcd_display_string("bye", 2)
 
 
-controller = Controller("controller1", [ControlledObject(home_monitor_config)])
 # lcd_thread = DisplayThread()
 try:
     # lcd_thread.start()
+    controller = Controller("controller1", [ControlledObject(home_monitor_config)])
     controller.on_receive({
         EVENT: BEGIN
     }, "events")
