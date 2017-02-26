@@ -11,6 +11,7 @@ class DefaultLogger(logging.Logger):
         handler = logging.FileHandler(name + ".log", "a")
         handler.formatter = logging.Formatter(fmt=fmt)
         self.addHandler(handler)
+        self.addHandler(logging.StreamHandler())
 
     def debug(self, msg, *args, **kwargs):
         kwargs["line_no"] = sys._getframe(1).f_lineno
