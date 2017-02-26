@@ -14,16 +14,16 @@ class DefaultLogger(logging.Logger):
         self.addHandler(logging.StreamHandler())
 
     def debug(self, msg, *args, **kwargs):
-        kwargs["line_no"] = sys._getframe(1).f_lineno
-        logging.Logger.debug(self, msg, *args, extra=kwargs)
+        rec = {"line_no": sys._getframe(1).f_lineno}
+        logging.Logger.debug(self, msg, *args, extra=rec, **kwargs)
 
     def error(self, msg, *args, **kwargs):
-        kwargs["line_no"] = sys._getframe(1).f_lineno
-        logging.Logger.error(self, msg, *args, extra=kwargs)
+        rec = {"line_no": sys._getframe(1).f_lineno}
+        logging.Logger.error(self, msg, *args, extra=rec, **kwargs)
 
     def info(self, msg, *args, **kwargs):
-        kwargs["line_no"] = sys._getframe(1).f_lineno
-        logging.Logger.info(self, msg, *args, extra=kwargs)
+        rec = {"line_no": sys._getframe(1).f_lineno}
+        logging.Logger.info(self, msg, *args, extra=rec, **kwargs)
 
 
 Log = DefaultLogger(default_name, level=logging.INFO)
