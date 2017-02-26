@@ -25,7 +25,8 @@ class MotionDetector(DeviceBase):
     def cleanup(self):
         self._timer.quit()
         self._timer.join()
-        self._light.relay_disconnected()
+        self.relay_disconnected()
+        self._light.off()
         self._light.close()
         self._light = None
         self._sensor.when_motion = None
