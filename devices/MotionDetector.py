@@ -71,5 +71,5 @@ motion_detector_config = {
     # mandatory
     DEVICE_OBJECT: None,
     CONSTRUCTOR: MotionDetector,
-    DE_CONSTRUCTOR: MotionDetector.cleanup
+    CLEANUP: MotionDetector.cleanup
 }

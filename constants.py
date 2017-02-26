@@ -1,7 +1,4 @@
-INPUT_PIN = "inputPin"
-POWER_PIN = "powerPin"
-LED_PIN = "ledPin"
-DE_CONSTRUCTOR = "deConstructor"
+CLEANUP = "cleanup"
 CONSTRUCTOR = "constructor"
 FROM = "from"
 TO = "to"
@@ -9,7 +6,6 @@ TIMESTAMP = "timestamp"
 ACTION = "action"
 SET_MODE_AWAY = "setModeAway"
 SET_MODE_HOME = "setModeHome"
-
 
 DEVICE_OBJECT = "deviceObject"
 DEVICE_CONFIG = "deviceConfig"
@@ -38,5 +34,4 @@ MODE = "mode"
 MESSAGE = "message"
 SEND= "send"
 COMMAND = "command"
-DEBUG_LOG = "debugLog"
 

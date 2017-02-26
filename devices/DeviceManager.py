@@ -35,7 +35,7 @@ class DeviceManager:
             try:
                 Log.info("un_initializing %s", device_name)
                 device_config = self.devices[device_name]
-                device_config[DE_CONSTRUCTOR](device_config[DEVICE_OBJECT])
+                device_config[CLEANUP](device_config[DEVICE_OBJECT])
             except Exception:
                 Log.error("Exception on un_initialize %s", device_name, exc_info=1)
                 raise

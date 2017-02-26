@@ -36,5 +36,5 @@ buzzer_config = {
     # mandatory
     DEVICE_OBJECT: None,
     CONSTRUCTOR: TimedBuzzer,
-    DE_CONSTRUCTOR: TimedBuzzer.cleanup
+    CLEANUP: TimedBuzzer.cleanup
 }

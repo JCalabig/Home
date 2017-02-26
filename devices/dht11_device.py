@@ -39,5 +39,5 @@ dht11_config = {
     # mandatory
     DEVICE_OBJECT: None,
     CONSTRUCTOR: Dht11Device,
-    DE_CONSTRUCTOR: Dht11Device.cleanup
+    CLEANUP: Dht11Device.cleanup
 }
