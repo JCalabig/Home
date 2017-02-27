@@ -12,13 +12,12 @@ class Connection:
 
     def connect(self):
         try:
-            print("connecting")
             self.channel = self._connection.channel()
             self.channel.confirm_delivery()
         except:
             Log.info("Exception", exc_info=1)
 
-    def un_initialize(self):
+    def cleanup(self):
         self.channel.close()
         self.channel = None
         self._connection.close()

@@ -11,11 +11,10 @@ class Receiver:
         self._routing_key = routing_key
 
     def consume_callback(self, ch, method, properties, body):
-        Log.info("<<<<<<<<<<<<<<<<<<<<<< subscribe received: %s:%s %s, properties: %s",
-                 method.routing_key, body, method.delivery_tag, str(properties))
+        Log.info("<<receive<<:%s, tag: %s, properties: %s", body, method.delivery_tag, str(properties))
         try:
             self._on_receive(json.loads(body), method.routing_key)
-        except Exception:
+        except:
             Log.error("Exception", exc_info=1)
         finally:
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -32,8 +31,8 @@ class Receiver:
         self._connection.channel.basic_consume(self.consume_callback,
                                                queue=self._machine_id)
 
-        Log.info("waiting for {}. To exit press CTRL+C".format(self._routing_key))
+        Log.info("block_receive: waiting for {}. To exit press CTRL+C".format(self._routing_key))
         self._connection.channel.start_consuming()
 
-    def un_initialize(self):
+    def cleanup(self):
         pass

@@ -16,9 +16,9 @@ class MessageQueue:
 
     def cleanup(self):
         if self._connection is not None:
-            self.sender.un_initialize()
-            self.receiver.un_initialize()
-            self._connection.un_initialize()
+            self.sender.cleanup()
+            self.receiver.cleanup()
+            self._connection.cleanup()
         self.sender = None
         self.receiver = None
         self._connection = None

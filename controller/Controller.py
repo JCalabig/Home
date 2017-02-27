@@ -13,11 +13,11 @@ class Controller:
         self._message_queue = MessageQueue(self._machine_id, send_key="commands",
                                            receive_key="events", on_receive=self.on_receive)
         self._controlled_states = controlled_states
-        self._timer = CountdownTimer(60, self.get_temp_readings, name="dht controller")
+        self._timer = CountdownTimer(60, self.get_temp_readings, name="get_temp_readings")
         self._timer.start()
 
     def get_temp_readings(self):
-        Log.info("getting temp readings")
+        Log.info("get_temp_readings: requesting")
         self.send({
             TYPE: COMMAND,
             DEVICE: "dht11",
@@ -48,19 +48,19 @@ class Controller:
         event_payload.setdefault(TARGET, self._machine_id)
 
     def process_event(self, event_payload):
-        Log.info("... on event %s", str(event_payload))
+        Log.info("controller event: [%s]", event_payload[EVENT])
         for controlled_state in self._controlled_states:
             next_state, actions = controlled_state.evaluate(event_payload)
             for action in actions:
                 self.do_action(action, controlled_state, event_payload)
             if next_state is not None:
                 controlled_state.state = next_state
-            Log.info("state after actions: %s, mode: %s after event %s",
-                     controlled_state.state, controlled_state.mode, str(event_payload))
+            Log.info("after event [%s]: state: [%s], mode: [%s]",
+                     event_payload[EVENT], controlled_state.state, controlled_state.mode)
 
     def do_action(self, action, controlled_state, event_payload):
         name = action[ACTION]
-        Log.info("performing action: {} on event {}".format(name, str(event_payload)))
+        Log.info("do action: [{}] on event [{}]".format(name, event_payload[EVENT]))
         try:
             if name == SET_MODE_AWAY:
                 controlled_state.mode = AWAY
@@ -70,6 +70,7 @@ class Controller:
                 Log.info("set mode: Home")
             elif name == SEND:
                 payload = copy.deepcopy(action)
+                Log.info("sending: [%s].[%s]", action[DEVICE], action[OP_CODE])
                 del payload[ACTION]
                 self.send(payload)
         except Exception:

@@ -8,10 +8,28 @@ default_name = "Home"
 class DefaultLogger(logging.Logger):
     def __init__(self, name, level=logging.INFO, fmt=default_format):
         logging.Logger.__init__(self, name, level)
-        handler = logging.FileHandler(name + ".log", "a")
-        handler.formatter = logging.Formatter(fmt=fmt)
-        self.addHandler(handler)
+        self._filename = name + ".log"
+        self._delete_file()
+        self._formatter = fmt
+        self._handler = None
         self.addHandler(logging.StreamHandler())
+        self.create_file_handler()
+
+    def create_file_handler(self):
+        self._handler = logging.FileHandler(self._filename, "a")
+        self._handler.formatter = logging.Formatter(fmt=self._formatter)
+        self.addHandler(self._handler)
+
+    def _delete_file(self):
+        if os.path.isfile(self._filename) and os.path.exists(self._filename):
+            os.remove(self._filename)
+
+    def delete_file_handler(self):
+        if self._handler is None:
+            return
+        self._handler.close()
+        self.removeHandler(self._handler)
+        self._handler = None
 
     def debug(self, msg, *args, **kwargs):
         rec = self._get_caller_info()

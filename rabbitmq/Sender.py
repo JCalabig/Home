@@ -28,7 +28,7 @@ class Sender:
                                                self._routing_key,
                                                json.dumps(payload),
                                                self._properties)
-        Log.info(">>>>>>>>>>>>>>>>>>>>>>>>>sending: (key:%s)%s", self._routing_key, str(payload))
+        Log.info(">>send>>:%s", str(payload))
 
-    def un_initialize(self):
+    def cleanup(self):
         pass

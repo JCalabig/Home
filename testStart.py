@@ -10,5 +10,5 @@ sender.send({
     TO: "controller1",
     EVENT:"away"
     })
-sender.un_initialize()
-connection.un_initialize()
+sender.cleanup()
+connection.cleanup()
