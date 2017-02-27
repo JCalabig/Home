@@ -5,6 +5,10 @@ from rabbitmq.Connection import Connection
 from rabbitmq.Sender import Sender
 from config import queue_server, username, password
 
+# controller to query for known devices at the beginning
+# this list of devices will be used for periodic hearbeat
+# devices to send a heartbeat periodically so both sides are autonomous
+
 
 class PeriodicHeartbeat:
     def __init__(self, machine_id):

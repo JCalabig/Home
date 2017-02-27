@@ -1,6 +1,5 @@
 import copy
 from utils.DefaultLogger import Log
-from utils.Countdown import CountdownTimer
 from constants import *
 from rabbitmq.MessageQueue import MessageQueue
 
