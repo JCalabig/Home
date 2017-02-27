@@ -11,11 +11,12 @@ class Receiver:
         self._routing_key = routing_key
 
     def consume_callback(self, ch, method, properties, body):
-        Log.info("<<receive<<:%s, tag: %s, properties: %s", body, method.delivery_tag, str(properties))
+        Log.info("<<receive<<:%s", body)
         try:
             self._on_receive(json.loads(body), method.routing_key)
         except:
             Log.error("Exception", exc_info=1)
+            raise
         finally:
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
