@@ -13,7 +13,8 @@ class Receiver:
     def consume_callback(self, ch, method, properties, body):
         Log.info("<<receive<<:%s", body)
         try:
-            self._on_receive(json.loads(body), method.routing_key)
+            if self._on_receive is not None:
+                self._on_receive(json.loads(body), method.routing_key)
         except:
             Log.error("Exception", exc_info=1)
             raise

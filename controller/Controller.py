@@ -5,33 +5,21 @@ from constants import *
 from rabbitmq.MessageQueue import MessageQueue
 
 
-# controller to have a periodic thread to ask for DHT11 data!
-
 class Controller:
     def __init__(self, machine_id, controlled_states):
         self._machine_id = machine_id
         self._message_queue = MessageQueue(self._machine_id, send_key="commands",
                                            receive_key="events", on_receive=self.on_receive)
         self._controlled_states = controlled_states
-        self._timer = CountdownTimer(60, self.get_temp_readings, name="get_temp_readings")
-        self._timer.start()
 
-    def get_temp_readings(self):
-        Log.info("get_temp_readings: requesting")
-        self.send({
-            TYPE: COMMAND,
-            DEVICE: "dht11",
-            OP_CODE: "read"
-        })
-        self._timer.reset()
+    def cleanup(self):
+        self._message_queue.cleanup()
 
     def send(self, payload):
         self._message_queue.send(payload)
 
     def block_receive(self):
         self._message_queue.block_receive()
-        self._timer.quit()
-        self._timer.join()
 
     def on_receive(self, event_payload, routing_key):
         self.set_payload_defaults(event_payload)
@@ -73,5 +61,5 @@ class Controller:
                 Log.info("sending: [%s].[%s]", action[DEVICE], action[OP_CODE])
                 del payload[ACTION]
                 self.send(payload)
-        except Exception:
+        except:
             Log.info("Exception", exc_info=1)
