@@ -39,7 +39,7 @@ class MessageQueue:
             if obj is not None:
                 obj.cleanup()
         except:
-            Log.info("Exception", exc_info=1)
+            Log.debug("Exception", exc_info=1)
 
     def cleanup(self):
         MessageQueue._ignore_exceptions(self._receiver)
@@ -66,8 +66,8 @@ class MessageQueue:
                 self.cleanup()
                 return
             except:
-                Log.info("Exception", exc_info=1)
-                sleep(1)
+                Log.debug("Exception", exc_info=1)
+                sleep(10)
                 MessageQueue._ignore_exceptions(self._receiver)
                 MessageQueue._ignore_exceptions(self._connection)
                 self._receiver = None
