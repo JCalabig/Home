@@ -22,8 +22,10 @@ class Sender:
                 self._on_send(payload)
         except Exception:
             Log.error("Exception", exc_info=1)
+        Log.info(">>send1:>>")
         self._connection.channel.exchange_declare(exchange=self._exchange,
                                                   type='direct', durable=True)
+        Log.info(">>send2>>")
         self._connection.channel.basic_publish(self._exchange,
                                                self._routing_key,
                                                json.dumps(payload),

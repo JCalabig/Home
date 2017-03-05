@@ -15,7 +15,7 @@ class MotionDetector(DeviceBase):
     _RELAY_DISCONNECT_SECONDS = 10
 
     def __init__(self, device_id, device_manager, device_config):
-        DeviceBase.__init__(self, device_id, device_manager, device_config)
+        DeviceBase.__init__(self, device_id, device_manager, device_config, begin_send=True)
         for pin in MotionDetector._RELAY_PINS:
             gpio.setup(pin, gpio.OUT)
             gpio.output(pin, MotionDetector._RELAY_DISCONNECT)

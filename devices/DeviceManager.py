@@ -10,6 +10,7 @@ from rabbitmq.MessageQueue import MessageQueue
 
 class DeviceManager:
     def send(self, payload):
+        Log.info("device manager sending...")
         self._message_queue.send(payload)
 
     def block_receive(self):
@@ -41,6 +42,7 @@ class DeviceManager:
                 raise
 
     def on_receive(self, event, routing_key):
+        Log.info("on_receive event1")
         if event.get(TARGET, self._machine_id) != self._machine_id:
             return
         op_code = event[OP_CODE]

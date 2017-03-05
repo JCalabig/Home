@@ -20,14 +20,18 @@ class MessageQueue:
 
     def send(self, payload):
         try:
+            Log.info("mq send1")
             if self._connection is None:
+                Log.info("mq send2")
                 self._connection = Connection(queue_server, username, password)
             if self._sender is None:
+                Log.info("mq send3")
                 self._sender = Sender(self._connection, self._machine_id, self._send_key, exchange=self._send_key,
                                       on_send=self._on_send)
-                self._sender.send(payload)
+            Log.info("mq send4")
+            self._sender.send(payload)
         except:
-            Log.debug("Exception", exc_info=1)
+            Log.info("Exception", exc_info=1)
             MessageQueue._ignore_exceptions(self._sender)
             MessageQueue._ignore_exceptions(self._connection)
             self._sender = None
@@ -39,7 +43,7 @@ class MessageQueue:
             if obj is not None:
                 obj.cleanup()
         except:
-            Log.debug("Exception", exc_info=1)
+            Log.info("Exception", exc_info=1)
 
     def cleanup(self):
         MessageQueue._ignore_exceptions(self._receiver)
@@ -60,13 +64,13 @@ class MessageQueue:
                                               on_receive=self._on_receive,
                                               queue_name=self._queue_name)
 
-                    self._receiver.block_receive()
+                self._receiver.block_receive()
             except KeyboardInterrupt:
                 Log.info("MessageQueue got KeyboardInterrupt")
                 self.cleanup()
                 return
             except:
-                Log.debug("Exception", exc_info=1)
+                Log.info("Exception", exc_info=1)
                 sleep(5)
                 MessageQueue._ignore_exceptions(self._receiver)
                 MessageQueue._ignore_exceptions(self._connection)
