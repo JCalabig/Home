@@ -25,6 +25,4 @@ try:
 except Exception:
     Log.info("Exception", exc_info=1)
 finally:
-    if controller is not None:
-        controller.cleanup()
     pass

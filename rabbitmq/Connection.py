@@ -17,8 +17,17 @@ class Connection:
         except:
             Log.info("Exception", exc_info=1)
 
+    @staticmethod
+    def _ignore_exceptions(obj):
+        try:
+            if obj is not None:
+                obj.close()
+        except:
+            Log.debug("Exception", exc_info=1)
+
+
     def cleanup(self):
-        self.channel.close()
+        Connection._ignore_exceptions(self.channel)
+        Connection._ignore_exceptions(self._connection)
         self.channel = None
-        self._connection.close()
         self._connection = None
