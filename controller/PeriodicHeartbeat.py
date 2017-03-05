@@ -1,5 +1,4 @@
 from utils.DefaultLogger import Log
-from utils.Countdown import CountdownTimer
 from constants import *
 import threading
 from rabbitmq.MessageQueue import MessageQueue
@@ -17,7 +16,7 @@ class PeriodicHeartbeat(threading.Thread):
         self._message_queue = MessageQueue(self._machine_id, send_key="commands",
                                            receive_key="events", on_receive=self.on_receive,
                                            queue_name=self._queue_name)
-        self._timer = CountdownTimer(60, self._on_periodic_timer, name="_on_periodic_timer")
+        # self._timer = CountdownTimer(60, self._on_periodic_timer, name="_on_periodic_timer")
         Log.info("PeriodicHeartbeat: starting")
         self._timer.start()
 
@@ -34,7 +33,7 @@ class PeriodicHeartbeat(threading.Thread):
                 DEVICE: device,
                 OP_CODE: "resumeEvents"
             })
-        self._timer.reset()
+        # self._timer.reset()
 
     def on_receive(self, event_payload, routing_key):
         self.set_payload_defaults(event_payload)
@@ -55,6 +54,6 @@ class PeriodicHeartbeat(threading.Thread):
 
     def run(self):
         self._message_queue.block_receive()
-        self._timer.quit()
-        self._timer.join()
+        # self._timer.quit()
+        # self._timer.join()
 
