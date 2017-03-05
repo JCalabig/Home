@@ -13,32 +13,10 @@ from config import home_monitor_config
 from constants import *
 from controller.Controller import Controller
 from utils.ControlledObject import ControlledObject
-from PeriodicHeartbeat import PeriodicHeartbeat
 
 
-class DisplayThread(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self._quit = False
-        self.lcd = display()
-
-    def quit(self):
-        self._quit = True
-        self.join()
-
-    def run(self):
-        while not self._quit:
-            message = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
-            self.lcd.lcd_display_string(message, 1)
-            time.sleep(1)
-        self.lcd.lcd_display_string("bye", 2)
-
-heartbeat = None
 controller = None
-# lcd_thread = DisplayThread()
 try:
-    # lcd_thread.start()
-    heartbeat = PeriodicHeartbeat("controller1")
     controller = Controller("controller1", [ControlledObject(home_monitor_config)])
     controller.on_receive({
         EVENT: BEGIN
@@ -47,9 +25,6 @@ try:
 except Exception:
     Log.info("Exception", exc_info=1)
 finally:
-    # lcd_thread.quit()
-    if heartbeat is not None:
-        heartbeat.cleanup()
     if controller is not None:
         controller.cleanup()
     pass

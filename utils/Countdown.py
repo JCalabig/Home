@@ -1,5 +1,5 @@
 from DefaultLogger import Log
-import threading, datetime, time
+import threading, time
 
 
 class CountdownTimer(threading.Thread):

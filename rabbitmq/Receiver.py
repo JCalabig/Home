@@ -3,12 +3,14 @@ from utils.DefaultLogger import Log
 
 
 class Receiver:
-    def __init__(self, connection, receiver_machine_id, routing_key, on_receive, exchange="home.exch"):
+    def __init__(self, connection, receiver_machine_id, routing_key, on_receive,
+                 queue_name=None, exchange="home.exch"):
         self._connection = connection
         self._machine_id = receiver_machine_id
         self._on_receive = on_receive
         self._exchange = exchange
         self._routing_key = routing_key
+        self._queue_name = queue_name or receiver_machine_id
 
     def consume_callback(self, ch, method, properties, body):
         Log.info("<<receive<<:%s", body)
@@ -26,12 +28,12 @@ class Receiver:
             self._connection.connect()
         self._connection.channel.exchange_declare(exchange=self._exchange,
                                                   type='direct', durable=True)
-        self._connection.channel.queue_declare(queue=self._machine_id, exclusive=False)
+        self._connection.channel.queue_declare(queue=self._queue_name, exclusive=False)
         self._connection.channel.queue_bind(exchange=self._exchange,
-                                            queue=self._machine_id,
+                                            queue=self._queue_name,
                                             routing_key=self._routing_key)
         self._connection.channel.basic_consume(self.consume_callback,
-                                               queue=self._machine_id)
+                                               queue=self._queue_name)
 
         Log.info("block_receive: waiting for {}. To exit press CTRL+C".format(self._routing_key))
         self._connection.channel.start_consuming()

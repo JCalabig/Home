@@ -26,8 +26,6 @@ class Controller:
             return
         if event_payload[TYPE] == EVENT:
             self.process_event(event_payload)
-        else:
-            Log.info("%s will be handled separately", event_payload[TYPE])
 
     def set_payload_defaults(self, event_payload):
         event_payload.setdefault(TYPE, EVENT)
