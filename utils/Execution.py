@@ -47,7 +47,7 @@ class IntervalExecution(RepeatedExecution):
         RepeatedExecution.__init__(self, self._internal_action, start, tag)
 
     def reset(self):
-        self._last_execution = time.time()
+        self._last_execution = 0
 
     def _internal_action(self):
         if (time.time() - self._last_execution) < self._interval_seconds:
