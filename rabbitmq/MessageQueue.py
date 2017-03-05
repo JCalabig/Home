@@ -20,15 +20,11 @@ class MessageQueue:
 
     def send(self, payload):
         try:
-            Log.info("mq send1")
             if self._connection is None:
-                Log.info("mq send2")
                 self._connection = Connection(queue_server, username, password)
             if self._sender is None:
-                Log.info("mq send3")
                 self._sender = Sender(self._connection, self._machine_id, self._send_key, exchange=self._send_key,
                                       on_send=self._on_send)
-            Log.info("mq send4")
             self._sender.send(payload)
         except:
             Log.info("Exception", exc_info=1)
@@ -71,7 +67,7 @@ class MessageQueue:
                 return
             except:
                 Log.info("Exception", exc_info=1)
-                sleep(5)
+                sleep(1)
                 MessageQueue._ignore_exceptions(self._receiver)
                 MessageQueue._ignore_exceptions(self._connection)
                 self._receiver = None
