@@ -15,23 +15,24 @@ class MessageQueue:
         self._on_receive = on_receive
         self._queue_name = queue_name
         self._sender = None
+        self._sender_connection = None
         self._receiver = None
-        self._connection = None
+        self._receiver_connection = None
 
     def send(self, payload):
         try:
-            if self._connection is None:
-                self._connection = Connection(queue_server, username, password)
+            if self._sender_connection is None:
+                self._sender_connection = Connection(queue_server, username, password)
             if self._sender is None:
-                self._sender = Sender(self._connection, self._machine_id, self._send_key, exchange=self._send_key,
-                                      on_send=self._on_send)
+                self._sender = Sender(self._sender_connection, self._machine_id, self._send_key,
+                                      exchange=self._send_key, on_send=self._on_send)
             self._sender.send(payload)
         except:
             Log.info("Exception", exc_info=1)
             MessageQueue._ignore_exceptions(self._sender)
-            MessageQueue._ignore_exceptions(self._connection)
+            MessageQueue._ignore_exceptions(self._sender_connection)
             self._sender = None
-            self._connection = None
+            self._sender_connection = None
 
     @staticmethod
     def _ignore_exceptions(obj):
@@ -43,19 +44,21 @@ class MessageQueue:
 
     def cleanup(self):
         MessageQueue._ignore_exceptions(self._receiver)
+        MessageQueue._ignore_exceptions(self._receiver_connection)
         MessageQueue._ignore_exceptions(self._sender)
-        MessageQueue._ignore_exceptions(self._connection)
+        MessageQueue._ignore_exceptions(self._sender_connection)
         self._receiver = None
+        self._receiver_connection = None
         self._sender = None
-        self._connection = None
+        self._sender_connection = None
 
     def block_receive(self):
         while True:
             try:
-                if self._connection is None:
-                    self._connection = Connection(queue_server, username, password)
+                if self._receiver_connection is None:
+                    self._receiver_connection = Connection(queue_server, username, password)
                 if self._receiver is None:
-                    self._receiver = Receiver(self._connection, self._machine_id,
+                    self._receiver = Receiver(self._receiver_connection, self._machine_id,
                                               self._receive_key, exchange=self._receive_key,
                                               on_receive=self._on_receive,
                                               queue_name=self._queue_name)
@@ -69,6 +72,6 @@ class MessageQueue:
                 Log.debug("Exception", exc_info=1)
                 sleep(10)
                 MessageQueue._ignore_exceptions(self._receiver)
-                MessageQueue._ignore_exceptions(self._connection)
+                MessageQueue._ignore_exceptions(self._receiver_connection)
                 self._receiver = None
-                self._connection = None
+                self._receiver_connection = None
