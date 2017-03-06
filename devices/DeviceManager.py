@@ -14,8 +14,13 @@ class DeviceManager:
         self._message_queue.send(payload)
 
     def block_receive(self):
-        self._message_queue.block_receive()
-        self.cleanup()
+        try:
+            self._message_queue.block_receive()
+        except:
+            Log.error("Exception", exc_info=1)
+            raise
+        finally:
+            self.cleanup()
 
     def __init__(self, machine_id, device_config):
         self._machine_id = machine_id

@@ -12,24 +12,24 @@ from utils.Execution import IntervalExecution
 
 class ControllerHeartbeat(threading.Thread):
     _INACTIVE_DEVICE_TIMEOUT = 60
+    _INTERVAL = 15
 
-    def __init__(self, machine_id, tag=""):
+    def __init__(self, machine_id):
         threading.Thread.__init__(self)
-        self.tag = tag
+        self._read_devices = ["dht11"]
         self._devices = {}
         self._lock = threading.RLock()
         self._machine_id = machine_id
         queue_name = "{}_controller_heartbeat_queue".format(self._machine_id)
-        self._message_queue = MessageQueue(self._machine_id, send_key="commands",
-                                           receive_key="events", on_receive=self.on_receive,
-                                           queue_name=queue_name)
-        self._interval = IntervalExecution(self._interval_action, 60, start=True, tag="controllerHeartbeat")
+        self._message_queue = MessageQueue(self._machine_id, send_key="commands", receive_key="events",
+                                           on_receive=self.on_receive, queue_name=queue_name, tag="controllerHeartbeat")
+        self._interval = IntervalExecution(self._interval_action, ControllerHeartbeat._INTERVAL, start=True,
+                                           tag="CH interval")
         self.start()
 
     def _interval_action(self):
         with self._lock:
             for key in self._devices:
-                # find active devices
                 last_hello = self._devices[key][LAST_HELLO]
                 device = self._devices[key][DEVICE]
                 target = self._devices[key][TARGET]
@@ -37,14 +37,13 @@ class ControllerHeartbeat(threading.Thread):
                 if time.time() - last_hello > ControllerHeartbeat._INACTIVE_DEVICE_TIMEOUT:
                     Log.info("inactive device: last hello from %s was %s", key, last_hello)
                     continue
-
                 self._message_queue.send({
                     TYPE: COMMAND,
                     TARGET: target,
                     DEVICE: device,
                     OP_CODE: "resumeEvents"
                 })
-                if device == "dht11":
+                if device in self._read_devices:
                     self._message_queue.send({
                         TYPE: COMMAND,
                         TARGET: target,
@@ -52,10 +51,24 @@ class ControllerHeartbeat(threading.Thread):
                         OP_CODE: "read"
                     })
 
+    def cleanup(self):
+        Log.info("ControllerHeartbeat: quitting")
+        try:
+            self._interval.quit()
+            self._message_queue.cleanup()
+        except:
+            Log.info("Exception", exc_info=1)
+        finally:
+            Log.info("ControllerHeartbeat: quitting exited")
+
     def run(self):
-        Log.info("%s: started", self.tag)
-        self._message_queue.block_receive()
-        self._interval.quit()
+        try:
+            Log.info("ControllerHeartbeat: thread started")
+            self._message_queue.block_receive()
+        except:
+            Log.info("Exception", exc_info=1)
+        finally:
+            Log.info("ControllerHeartbeat: thread exited")
 
     def on_receive(self, event_payload, routing_key):
         self.set_payload_defaults(event_payload)

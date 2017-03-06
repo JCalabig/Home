@@ -8,7 +8,7 @@ class Controller:
     def __init__(self, machine_id, controlled_states):
         self._machine_id = machine_id
         self._message_queue = MessageQueue(self._machine_id, send_key="commands",
-                                           receive_key="events", on_receive=self.on_receive)
+                                           receive_key="events", on_receive=self.on_receive, tag="Controller")
         self._controlled_states = controlled_states
 
     def cleanup(self):
@@ -19,6 +19,7 @@ class Controller:
 
     def block_receive(self):
         self._message_queue.block_receive()
+        self.cleanup()
 
     def on_receive(self, event_payload, routing_key):
         self.set_payload_defaults(event_payload)

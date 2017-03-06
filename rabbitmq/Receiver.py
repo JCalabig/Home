@@ -4,12 +4,13 @@ from utils.DefaultLogger import Log
 
 class Receiver:
     def __init__(self, connection, receiver_machine_id, routing_key, on_receive,
-                 queue_name=None, exchange="home.exch"):
+                 queue_name=None, exchange="home.exch", tag=""):
         self._connection = connection
         self._machine_id = receiver_machine_id
         self._on_receive = on_receive
         self._exchange = exchange
         self._routing_key = routing_key
+        self._tag = tag
         self._queue_name = queue_name or receiver_machine_id
 
     def consume_callback(self, ch, method, properties, body):
@@ -18,7 +19,7 @@ class Receiver:
             if self._on_receive is not None:
                 self._on_receive(json.loads(body), method.routing_key)
         except:
-            Log.error("Exception", exc_info=1)
+            Log.info("Exception", exc_info=1)
             raise
         finally:
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -35,8 +36,17 @@ class Receiver:
         self._connection.channel.basic_consume(self.consume_callback,
                                                queue=self._queue_name)
 
-        Log.info("block_receive: waiting for {}. To exit press CTRL+C".format(self._routing_key))
+        Log.info("block_receive: {} waiting for {} on {}. To exit press CTRL+C".format(self._tag, self._routing_key,
+                                                                                       self._exchange))
         self._connection.channel.start_consuming()
+        Log.info("block_receive: {} exited consuming for {} on {}".format(self._tag, self._routing_key,
+                                                                          self._exchange))
 
     def cleanup(self):
+        try:
+            Log.info("{} calling stop consuming on {}".format(self._tag, self._routing_key,
+                                                              self._exchange))
+            self._connection.channel.stop_consuming()
+        except:
+            Log.info("Exception", exc_info=1)
         pass

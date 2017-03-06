@@ -25,7 +25,6 @@ class Connection:
         except:
             Log.debug("Exception", exc_info=1)
 
-
     def cleanup(self):
         Connection._ignore_exceptions(self.channel)
         Connection._ignore_exceptions(self._connection)
