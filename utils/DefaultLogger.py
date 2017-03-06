@@ -1,7 +1,7 @@
 import logging
 import sys, os
 
-default_format = "%(asctime)s|%(file_name)s:%(line_no)d|%(funcName)s %(message)s"
+default_format = "%(asctime)s|%(thread)d|%(file_name)s:%(line_no)d|%(funcName)s %(message)s"
 default_name = "Home"
 
 
