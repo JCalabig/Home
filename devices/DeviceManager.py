@@ -18,15 +18,11 @@ class DeviceManager:
             self._message_queue.block_receive()
         except:
             Log.error("Exception", exc_info=1)
-            raise
-        finally:
-            self.cleanup()
 
     def __init__(self, machine_id, device_config):
         self._machine_id = machine_id
         self.devices = device_config
-        self._message_queue = MessageQueue(self._machine_id, send_key="events",
-                                           receive_key="commands", on_receive=self.on_receive)
+        self._message_queue = MessageQueue(send_key="events", receive_key="commands", on_receive=self.on_receive)
         for device_name in self.devices:
             try:
                 Log.info("initializing %s", device_name)

@@ -1,34 +1,22 @@
-import json, pika
+import json
 from utils.DefaultLogger import Log
-from constants import *
+from QueueBase import QueueBase
 
 
-class Sender:
-    def __init__(self, connection, sender_machine_id, routing_key, on_send=None, exchange="home.exch"):
-        self._connection = connection
-        self._machine_id = sender_machine_id
-        self._exchange = exchange
-        self._routing_key = routing_key
+class Sender(QueueBase):
+    def __init__(self, host, username, password, routing_key, on_send, exchange, queue_name="", tag="", port=5672):
+        super(self.__class__, self).__init__(host, username, password, routing_key,
+                                             exchange, queue_name, tag, port)
         self._on_send = on_send
-        self._properties = pika.BasicProperties(content_type="application/json",
-                                                delivery_mode=2)  # 2 = persistent
 
     def send(self, payload):
-        payload[FROM] = self._machine_id
-        if self._connection.channel is None:
-            self._connection.connect()
         try:
             if self._on_send is not None:
                 self._on_send(payload)
-        except Exception:
+            self.channel.basic_publish(self.exchange,
+                                       self.routing_key,
+                                       json.dumps(payload),
+                                       self.properties)
+            Log.info(">>send>>:%s", str(payload))
+        except:
             Log.error("Exception", exc_info=1)
-        self._connection.channel.exchange_declare(exchange=self._exchange,
-                                                  type='direct', durable=True)
-        self._connection.channel.basic_publish(self._exchange,
-                                               self._routing_key,
-                                               json.dumps(payload),
-                                               self._properties)
-        Log.info(">>send>>:%s", str(payload))
-
-    def cleanup(self):
-        pass

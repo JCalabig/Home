@@ -20,11 +20,10 @@ class ControllerHeartbeat(threading.Thread):
         self._devices = {}
         self._lock = threading.RLock()
         self._machine_id = machine_id
-        queue_name = "{}_controller_heartbeat_queue".format(self._machine_id)
-        self._message_queue = MessageQueue(self._machine_id, send_key="commands", receive_key="events",
-                                           on_receive=self.on_receive, queue_name=queue_name, tag="controllerHeartbeat")
+        self._message_queue = MessageQueue(send_key="commands", receive_key="events",
+                                           on_receive=self.on_receive, tag="controllerHeartbeat")
         self._interval = IntervalExecution(self._interval_action, ControllerHeartbeat._INTERVAL, start=True,
-                                           tag="CH interval")
+                                           tag="controllerHeartbeatInterval")
         self.start()
 
     def _interval_action(self):
@@ -56,6 +55,8 @@ class ControllerHeartbeat(threading.Thread):
         try:
             self._interval.quit()
             self._message_queue.cleanup()
+            Log.info("ControllerHeartbeat: sleeping 10 secs to sync cleanup")
+            time.sleep(10)
         except:
             Log.info("Exception", exc_info=1)
         finally:

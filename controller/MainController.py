@@ -24,5 +24,6 @@ try:
     heartbeat = ControllerHeartbeat(machine_id)
     controller.block_receive()
     heartbeat.cleanup()
+    controller.cleanup()
 except Exception:
     Log.info("Exception", exc_info=1)

@@ -12,23 +12,22 @@ class RepeatedExecution(threading.Thread):
             self.start()
 
     def quit(self):
-        Log.info("%s: quitting", self.tag)
+        Log.info("%s: RepeatedExecution quitting", self.tag)
         try:
             self._quit = True
             if self is not threading.current_thread():
-                Log.info("%s: ... waiting to quit", self.tag)
                 self.join()
         finally:
-            Log.info("%s: quitting exited", self.tag)
+            Log.info("%s: RepeatedExecution quitting exited", self.tag)
 
     def run(self):
-        Log.info("%s: thread started", self.tag)
+        Log.info("%s: RepeatedExecution thread started", self.tag)
         try:
             while not self._quit:
                 if self._action is not None:
                     self._action()
         finally:
-            Log.info("%s: thread exited", self.tag)
+            Log.info("%s: RepeatedExecution thread exited", self.tag)
 
 
 class CountedExecution(RepeatedExecution):
