@@ -11,7 +11,7 @@ class QueueBase(object):
         self.exchange = exchange
         self.routing_key = routing_key
         self.tag = tag
-        self.channel.exchange_declare(exchange=self.exchange, type='direct', durable=True)
+        self.channel.exchange_declare(exchange=self.exchange, type='direct')
         result = self.channel.queue_declare(queue=queue_name, exclusive=False)
         self.queue_name = result.method.queue
         self.channel.queue_bind(exchange=self.exchange, queue=self.queue_name, routing_key=self.routing_key)
@@ -21,7 +21,13 @@ class QueueBase(object):
 
     def cleanup(self):
         self.quit = True
-        if self.channel.is_open is True:
-            self.channel.close()
-        if self._connection.is_open is True:
-            self._connection.close()
+        try:
+            if self.channel.is_open is True:
+                self.channel.close()
+        except:
+            pass
+        try:
+            if self._connection.is_open is True:
+                self._connection.close()
+        except:
+            pass

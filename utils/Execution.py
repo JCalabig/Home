@@ -1,3 +1,4 @@
+import uuid
 from DefaultLogger import Log
 import threading, time
 
@@ -5,6 +6,7 @@ import threading, time
 class RepeatedExecution(threading.Thread):
     def __init__(self, action, start=False, tag=""):
         threading.Thread.__init__(self)
+        self.track_id = str(uuid.uuid4())
         self.tag = tag
         self._action = action
         self._quit = False
@@ -21,13 +23,13 @@ class RepeatedExecution(threading.Thread):
             Log.info("%s: RepeatedExecution quitting exited", self.tag)
 
     def run(self):
-        Log.info("%s: RepeatedExecution thread started", self.tag)
+        Log.info("RepeatedExecution thread started (track:%s)", self.track_id)
         try:
             while not self._quit:
                 if self._action is not None:
                     self._action()
         finally:
-            Log.info("%s: RepeatedExecution thread exited", self.tag)
+            Log.info("RepeatedExecution thread exited (track:%s)", self.track_id)
 
 
 class CountedExecution(RepeatedExecution):

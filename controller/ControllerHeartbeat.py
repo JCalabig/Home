@@ -1,3 +1,4 @@
+import uuid
 from utils.DefaultLogger import Log
 from constants import *
 import threading, time
@@ -12,16 +13,20 @@ from utils.Execution import IntervalExecution
 
 class ControllerHeartbeat(threading.Thread):
     _INACTIVE_DEVICE_TIMEOUT = 60
-    _INTERVAL = 15
+    _INTERVAL = 5
 
     def __init__(self, machine_id):
         threading.Thread.__init__(self)
         self._read_devices = ["dht11"]
         self._devices = {}
         self._lock = threading.RLock()
+        self.track_id = str(uuid.uuid4())
         self._machine_id = machine_id
         self._message_queue = MessageQueue(send_key="commands", receive_key="events",
-                                           on_receive=self.on_receive, tag="controllerHeartbeat")
+                                           on_receive=self.on_receive,
+                                           send_queue_name="ControllerHeartbeat_{}_send_queue".format(machine_id),
+                                           receive_queue_name="ControllerHearbeat_{}_receive_queue".format(machine_id),
+                                           tag="controllerHeartbeat")
         self._interval = IntervalExecution(self._interval_action, ControllerHeartbeat._INTERVAL, start=True,
                                            tag="controllerHeartbeatInterval")
         self.start()
@@ -64,12 +69,12 @@ class ControllerHeartbeat(threading.Thread):
 
     def run(self):
         try:
-            Log.info("ControllerHeartbeat: thread started")
+            Log.info("ControllerHeartbeat: thread started (track:%s)", self.track_id)
             self._message_queue.block_receive()
         except:
             Log.info("Exception", exc_info=1)
         finally:
-            Log.info("ControllerHeartbeat: thread exited")
+            Log.info("ControllerHeartbeat: thread exited (track:%s)", self.track_id)
 
     def on_receive(self, event_payload, routing_key):
         self.set_payload_defaults(event_payload)

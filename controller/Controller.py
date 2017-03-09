@@ -8,7 +8,10 @@ from rabbitmq.MessageQueue import MessageQueue
 class Controller:
     def __init__(self, machine_id, controlled_states):
         self._machine_id = machine_id
-        self._message_queue = MessageQueue(send_key="commands", receive_key="events", on_receive=self.on_receive,
+        self._message_queue = MessageQueue(send_key="commands", receive_key="events",
+                                           on_receive=self.on_receive,
+                                           send_queue_name="Controller_{}_send_queue".format(machine_id),
+                                           receive_queue_name="Controller_{}_receive_queue".format(machine_id),
                                            tag="Controller")
         self._controlled_states = controlled_states
 
