@@ -28,7 +28,7 @@ class MessageQueue:
         try:
             if self._sender is None or self._sender.quit is True:
                 self._sender = Sender(queue_server, username, password, routing_key=self._send_key,
-                                      on_send=self._on_send, exchange=self._send_key, queue_name=self._send_queue_name,
+                                      exchange=self._send_key, queue_name=self._send_queue_name,
                                       tag=self._tag + "_sender")
             self._sender.send(payload)
         except:
@@ -44,23 +44,7 @@ class MessageQueue:
             self._receiver.cleanup()
 
     def block_receive(self):
-        Log.info("MessageQueue block_receive thread started (track:%s)", self.track_id)
-        try:
-            while self._quit is False:
-                try:
-                    if self._receiver is None or self._receiver.quit is True:
-                        self._receiver = Receiver(queue_server, username, password, routing_key=self._send_key,
-                                                  on_receive=self._on_receive, exchange=self._receive_key,
-                                                  queue_name=self._receive_queue_name, tag=self._tag + "_receiver")
-                    self._receiver.block_receive()
-                except KeyboardInterrupt:
-                    Log.info("MessageQueue %s got KeyboardInterrupt", self._tag)
-                    self._quit = True
-                except:
-                    Log.debug("Exception", exc_info=1)
-                    Log.info("sleeping 5 secs on queue connection failure")
-                    sleep(5)
-                if self._receiver is not None:
-                    self._receiver.cleanup()
-        finally:
-            Log.info("MessageQueue block_receive thread exited (track:%s)", self.track_id)
+        self._receiver = Receiver(queue_server, username, password, routing_key=self._send_key,
+                                  on_receive=self._on_receive, exchange=self._receive_key,
+                                  queue_name=self._receive_queue_name, tag=self._tag + "_receiver")
+        self._receiver.block_receive()

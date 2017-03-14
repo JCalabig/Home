@@ -4,15 +4,16 @@ from QueueBase import QueueBase
 
 
 class Sender(QueueBase):
-    def __init__(self, host, username, password, routing_key, on_send, exchange, queue_name="", tag="", port=5672):
+    def __init__(self, host, username, password, routing_key, exchange, queue_name="", tag="", port=5672):
         super(self.__class__, self).__init__(host, username, password, routing_key,
                                              exchange, queue_name, tag, port)
-        self._on_send = on_send
 
     def send(self, payload):
         try:
-            if self._on_send is not None:
-                self._on_send(payload)
+            if self.is_connected() is False:
+                self.connect()
+            if self.is_open() is False:
+                self.open_channel()
             self.channel.basic_publish(self.exchange,
                                        self.routing_key,
                                        json.dumps(payload),
