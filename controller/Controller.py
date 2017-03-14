@@ -2,29 +2,39 @@ import datetime
 import copy
 from utils.DefaultLogger import Log
 from constants import *
-from rabbitmq.MessageQueue import MessageQueue
+from rabbitmq.Receiver import Receiver
+from rabbitmq.Sender import Sender
+from config import queue_server, username, password
 
 
 class Controller:
     def __init__(self, machine_id, controlled_states):
         self._machine_id = machine_id
-        self._message_queue = MessageQueue(send_key="commands", receive_key="events",
-                                           on_receive=self.on_receive,
-                                           send_queue_name="Controller_{}_send_queue".format(machine_id),
-                                           receive_queue_name="Controller_{}_receive_queue".format(machine_id),
-                                           tag="Controller")
+
+        receiver_routing_and_exchange = "events"
+        receive_queue_name = "Controller_{}_receiver_queue".format(machine_id)
+        self._receiver = Receiver(queue_server, username, password, routing_key=receiver_routing_and_exchange,
+                                  on_receive=self.on_receive, exchange=receiver_routing_and_exchange,
+                                  queue_name=receive_queue_name)
+
+        sender_routing_and_exchange = "commands"
+        sender_queue_name = "Controller_{}_sender_queue".format(machine_id)
+        self._sender = Sender(queue_server, username, password, routing_key=sender_routing_and_exchange,
+                              exchange=sender_routing_and_exchange, queue_name=sender_queue_name)
+
         self._controlled_states = controlled_states
 
     def cleanup(self):
-        self._message_queue.cleanup()
+        self._receiver.cleanup()
+        self._sender.cleanup()
 
     def send(self, payload):
         payload[TIMESTAMP] = str(datetime.datetime.now())
         payload[FROM] = self._machine_id
-        self._message_queue.send(payload)
+        self._sender.send(payload)
 
     def block_receive(self):
-        self._message_queue.block_receive()
+        self._receiver.block_receive()
 
     def on_receive(self, event_payload, routing_key):
         self.set_payload_defaults(event_payload)

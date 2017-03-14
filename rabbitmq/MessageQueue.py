@@ -28,8 +28,7 @@ class MessageQueue:
         try:
             if self._sender is None or self._sender.quit is True:
                 self._sender = Sender(queue_server, username, password, routing_key=self._send_key,
-                                      exchange=self._send_key, queue_name=self._send_queue_name,
-                                      tag=self._tag + "_sender")
+                                      exchange=self._send_key, queue_name=self._send_queue_name)
             self._sender.send(payload)
         except:
             Log.info("Exception", exc_info=1)
@@ -46,5 +45,5 @@ class MessageQueue:
     def block_receive(self):
         self._receiver = Receiver(queue_server, username, password, routing_key=self._send_key,
                                   on_receive=self._on_receive, exchange=self._receive_key,
-                                  queue_name=self._receive_queue_name, tag=self._tag + "_receiver")
+                                  queue_name=self._receive_queue_name)
         self._receiver.block_receive()

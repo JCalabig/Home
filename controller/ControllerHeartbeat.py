@@ -2,7 +2,9 @@ import uuid
 from utils.DefaultLogger import Log
 from constants import *
 import threading, time
-from rabbitmq.MessageQueue import MessageQueue
+from rabbitmq.Receiver import Receiver
+from rabbitmq.Sender import Sender
+from config import queue_server, username, password
 from utils.Execution import IntervalExecution
 
 
@@ -22,11 +24,18 @@ class ControllerHeartbeat(threading.Thread):
         self._lock = threading.RLock()
         self.track_id = str(uuid.uuid4())
         self._machine_id = machine_id
-        self._message_queue = MessageQueue(send_key="commands", receive_key="events",
-                                           on_receive=self.on_receive,
-                                           send_queue_name="ControllerHeartbeat_{}_send_queue".format(machine_id),
-                                           receive_queue_name="ControllerHearbeat_{}_receive_queue".format(machine_id),
-                                           tag="controllerHeartbeat")
+
+        receiver_routing_and_exchange = "events"
+        receive_queue_name = "ControllerHeartbeat_{}_receiver_queue".format(machine_id)
+        self._receiver = Receiver(queue_server, username, password, routing_key=receiver_routing_and_exchange,
+                                  on_receive=self.on_receive, exchange=receiver_routing_and_exchange,
+                                  queue_name=receive_queue_name)
+
+        sender_routing_and_exchange = "commands"
+        sender_queue_name = "ControllerHeartbeat_{}_sender_queue".format(machine_id)
+        self._sender = Sender(queue_server, username, password, routing_key=sender_routing_and_exchange,
+                              exchange=sender_routing_and_exchange, queue_name=sender_queue_name)
+
         self._interval = IntervalExecution(self._interval_action, ControllerHeartbeat._INTERVAL, start=True,
                                            tag="controllerHeartbeatInterval")
         self.start()
@@ -41,14 +50,14 @@ class ControllerHeartbeat(threading.Thread):
                 if time.time() - last_hello > ControllerHeartbeat._INACTIVE_DEVICE_TIMEOUT:
                     Log.info("inactive device: last hello from %s was %s", key, last_hello)
                     continue
-                self._message_queue.send({
+                self._sender.send({
                     TYPE: COMMAND,
                     TARGET: target,
                     DEVICE: device,
                     OP_CODE: "resumeEvents"
                 })
                 if device in self._read_devices:
-                    self._message_queue.send({
+                    self._sender.send({
                         TYPE: COMMAND,
                         TARGET: target,
                         DEVICE: device,
@@ -59,7 +68,8 @@ class ControllerHeartbeat(threading.Thread):
         Log.info("ControllerHeartbeat: quitting")
         try:
             self._interval.quit()
-            self._message_queue.cleanup()
+            self._receiver.cleanup()
+            self._sender.cleanup()
             Log.info("ControllerHeartbeat: sleeping 10 secs to sync cleanup")
             time.sleep(10)
         except:
@@ -70,7 +80,7 @@ class ControllerHeartbeat(threading.Thread):
     def run(self):
         try:
             Log.info("ControllerHeartbeat: thread started (track:%s)", self.track_id)
-            self._message_queue.block_receive()
+            self._receiver.block_receive()
         except:
             Log.info("Exception", exc_info=1)
         finally:
