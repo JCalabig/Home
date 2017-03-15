@@ -32,7 +32,6 @@ class DeviceHeartbeat:
         for device in self._devices:
             self._sender.send({
                 TYPE: DEVICE_HELLO,
-                TARGET: self._machine_id,
                 DEVICE: device
             })
 
