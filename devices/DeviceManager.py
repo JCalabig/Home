@@ -5,24 +5,37 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.DefaultLogger import Log
 from constants import *
-from rabbitmq.MessageQueue import MessageQueue
+from rabbitmq.Receiver import Receiver
+from rabbitmq.Sender import Sender
+from config import queue_server, username, password
 
 
 class DeviceManager:
     def send(self, payload):
         Log.info("device manager sending...")
-        self._message_queue.send(payload)
+        self._sender.send(payload)
 
     def block_receive(self):
         try:
-            self._message_queue.block_receive()
+            self._receiver.block_receive()
         except:
             Log.error("Exception", exc_info=1)
 
     def __init__(self, machine_id, device_config):
         self._machine_id = machine_id
         self.devices = device_config
-        self._message_queue = MessageQueue(send_key="events", receive_key="commands", on_receive=self.on_receive)
+
+        receiver_routing_and_exchange = "commands"
+        receive_queue_name = "Device_{}_receiver_queue".format(machine_id)
+        self._receiver = Receiver(queue_server, username, password, routing_key=receiver_routing_and_exchange,
+                                  on_receive=self.on_receive, exchange=receiver_routing_and_exchange,
+                                  queue_name=receive_queue_name)
+
+        sender_routing_and_exchange = "events"
+        sender_queue_name = "Device_{}_sender_queue".format(machine_id)
+        self._sender = Sender(queue_server, username, password, routing_key=sender_routing_and_exchange,
+                              exchange=sender_routing_and_exchange, queue_name=sender_queue_name)
+
         for device_name in self.devices:
             try:
                 Log.info("initializing %s", device_name)
@@ -41,6 +54,8 @@ class DeviceManager:
             except Exception:
                 Log.error("Exception on cleanup %s", device_name, exc_info=1)
                 raise
+        self._receiver.cleanup()
+        self._sender.cleanup()
 
     def on_receive(self, event, routing_key):
         Log.info("on_receive event1")
