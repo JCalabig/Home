@@ -18,9 +18,8 @@ class Controller:
                                   queue_name=receive_queue_name)
 
         sender_routing_and_exchange = "commands"
-        sender_queue_name = "Controller_{}_sender_queue".format(machine_id)
         self._sender = Sender(queue_server, username, password, routing_key=sender_routing_and_exchange,
-                              exchange=sender_routing_and_exchange, queue_name=sender_queue_name)
+                              exchange=sender_routing_and_exchange)
 
         self._controlled_states = controlled_states
 

@@ -2,9 +2,8 @@ import pika
 
 
 class QueueBase(object):
-    def __init__(self, host, username, password, routing_key, exchange, queue_name="", port=5672):
+    def __init__(self, host, username, password, routing_key, exchange, port=5672):
         self._host = host
-        self.queue_name = queue_name
         self.exchange = exchange
         self.routing_key = routing_key
         self._port = port
@@ -32,8 +31,6 @@ class QueueBase(object):
         self.channel = self._connection.channel()
         self.channel.confirm_delivery()
         self.channel.exchange_declare(exchange=self.exchange, type='direct')
-        self.channel.queue_declare(queue=self.queue_name, exclusive=False)
-        self.channel.queue_bind(exchange=self.exchange, queue=self.queue_name, routing_key=self.routing_key)
 
     def disconnect(self):
         try:

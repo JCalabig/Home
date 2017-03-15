@@ -32,9 +32,8 @@ class DeviceManager:
                                   queue_name=receive_queue_name)
 
         sender_routing_and_exchange = "events"
-        sender_queue_name = "Device_{}_sender_queue".format(machine_id)
         self._sender = Sender(queue_server, username, password, routing_key=sender_routing_and_exchange,
-                              exchange=sender_routing_and_exchange, queue_name=sender_queue_name)
+                              exchange=sender_routing_and_exchange)
 
         for device_name in self.devices:
             try:

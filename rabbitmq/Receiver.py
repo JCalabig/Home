@@ -8,8 +8,15 @@ from utils.DefaultLogger import Log
 class Receiver(QueueBase):
     def __init__(self, host, username, password, routing_key, on_receive, exchange, queue_name="", port=5672):
         super(self.__class__, self).__init__(host, username, password, routing_key,
-                                             exchange, queue_name, port)
+                                             exchange, port)
+        self.queue_name = queue_name
         self._on_receive = on_receive
+
+    def connect(self):
+        super(self.__class__, self).connect()
+        if self.is_connected():
+            self.channel.queue_declare(queue=self.queue_name, exclusive=False)
+            self.channel.queue_bind(exchange=self.exchange, queue=self.queue_name, routing_key=self.routing_key)
 
     def _yield_get(self, inactivity_timeout=1):
         if self.quit is True:
@@ -62,7 +69,6 @@ if __name__ == "__main__":
 
     def on_receive(self, event_payload, routing_key):
         pass
-
 
     r = Receiver(queue_server, username, password, "events", on_receive=on_receive, exchange="events",
                  queue_name="Controller_controller1_receive_queue")

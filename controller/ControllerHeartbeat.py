@@ -32,9 +32,8 @@ class ControllerHeartbeat(threading.Thread):
                                   queue_name=receive_queue_name)
 
         sender_routing_and_exchange = "commands"
-        sender_queue_name = "ControllerHeartbeat_{}_sender_queue".format(machine_id)
         self._sender = Sender(queue_server, username, password, routing_key=sender_routing_and_exchange,
-                              exchange=sender_routing_and_exchange, queue_name=sender_queue_name)
+                              exchange=sender_routing_and_exchange)
 
         self._interval = IntervalExecution(self._interval_action, ControllerHeartbeat._INTERVAL, start=True,
                                            tag="controllerHeartbeatInterval")
@@ -50,19 +49,19 @@ class ControllerHeartbeat(threading.Thread):
                 if time.time() - last_hello > ControllerHeartbeat._INACTIVE_DEVICE_TIMEOUT:
                     Log.info("inactive device: last hello from %s was %s", key, last_hello)
                     continue
-                self._sender.send({
-                    TYPE: COMMAND,
-                    TARGET: target,
-                    DEVICE: device,
-                    OP_CODE: "resumeEvents"
-                })
-                if device in self._read_devices:
-                    self._sender.send({
-                        TYPE: COMMAND,
-                        TARGET: target,
-                        DEVICE: device,
-                        OP_CODE: "read"
-                    })
+                # self._sender.send({
+                #     TYPE: COMMAND,
+                #     TARGET: target,
+                #     DEVICE: device,
+                #     OP_CODE: "resumeEvents"
+                # })
+                # if device in self._read_devices:
+                #     self._sender.send({
+                #         TYPE: COMMAND,
+                #         TARGET: target,
+                #         DEVICE: device,
+                #         OP_CODE: "read"
+                #     })
 
     def cleanup(self):
         Log.info("ControllerHeartbeat: quitting")
@@ -102,6 +101,8 @@ class ControllerHeartbeat(threading.Thread):
 
     def process_device_hello(self, event_payload):
         with self._lock:
+            if FROM not in event_payload or DEVICE not in event_payload:
+                return
             from_machine_id = event_payload[FROM]
             device = event_payload[DEVICE]
             key = "{}|{}".format(from_machine_id, device)
@@ -111,3 +112,4 @@ class ControllerHeartbeat(threading.Thread):
                     DEVICE: device
                 }
             self._devices[key][LAST_HELLO] = time.time()
+            Log.info("got hello from %s", key)

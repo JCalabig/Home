@@ -4,9 +4,9 @@ from QueueBase import QueueBase
 
 
 class Sender(QueueBase):
-    def __init__(self, host, username, password, routing_key, exchange, queue_name="", port=5672):
+    def __init__(self, host, username, password, routing_key, exchange, port=5672):
         super(self.__class__, self).__init__(host, username, password, routing_key,
-                                             exchange, queue_name, port)
+                                             exchange, port)
 
     def send(self, payload):
         try:

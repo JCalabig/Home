@@ -21,9 +21,8 @@ class DeviceHeartbeat:
         self._devices = devices
 
         sender_routing_and_exchange = "events"
-        sender_queue_name = "DeviceHeartbeat_{}_sender_queue".format(machine_id)
         self._sender = Sender(queue_server, username, password, routing_key=sender_routing_and_exchange,
-                              exchange=sender_routing_and_exchange, queue_name=sender_queue_name)
+                              exchange=sender_routing_and_exchange)
 
         self._interval = IntervalExecution(self._interval_action, DeviceHeartbeat._INTERVAL, start=True,
                                            tag="controllerHeartbeatInterval")
