@@ -4,7 +4,7 @@ from constants import *
 
 
 class DeviceBase:
-    def __init__(self, device_id, device_manager, device_config, send_max=512, begin_send=False):
+    def __init__(self, device_id, device_manager, device_config, send_max=10, begin_send=False):
         self.device_id = device_id
         self.device_manager = device_manager
         self.device_config = device_config
