@@ -49,19 +49,19 @@ class ControllerHeartbeat(threading.Thread):
                 if time.time() - last_hello > ControllerHeartbeat._INACTIVE_DEVICE_TIMEOUT:
                     Log.info("inactive device: last hello from %s was %s", key, last_hello)
                     continue
-                # self._sender.send({
-                #     TYPE: COMMAND,
-                #     TARGET: target,
-                #     DEVICE: device,
-                #     OP_CODE: "resumeEvents"
-                # })
-                # if device in self._read_devices:
-                #     self._sender.send({
-                #         TYPE: COMMAND,
-                #         TARGET: target,
-                #         DEVICE: device,
-                #         OP_CODE: "read"
-                #     })
+                self._sender.send({
+                    TYPE: COMMAND,
+                    TARGET: target,
+                    DEVICE: device,
+                    OP_CODE: "resumeEvents"
+                })
+                if device in self._read_devices:
+                    self._sender.send({
+                        TYPE: COMMAND,
+                        TARGET: target,
+                        DEVICE: device,
+                        OP_CODE: "read"
+                    })
 
     def cleanup(self):
         Log.info("ControllerHeartbeat: quitting")
