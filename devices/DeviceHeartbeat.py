@@ -46,4 +46,4 @@ class DeviceHeartbeat:
         except:
             Log.info("Exception", exc_info=1)
         finally:
-            Log.info("ControllerHeartbeat: quitting exited")
+            Log.info("DeviceHeartbeat: quitting exited")
