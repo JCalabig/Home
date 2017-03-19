@@ -1,6 +1,6 @@
 from constants import *
 
-queue_server = "192.168.1.17"
+queue_server = "192.168.1.22"
 username = "test"
 password = "test"
 
