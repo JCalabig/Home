@@ -1,4 +1,3 @@
-import uuid
 from time import sleep
 from QueueBase import QueueBase
 import json
@@ -14,47 +13,38 @@ class Receiver(QueueBase):
 
     def connect(self):
         super(self.__class__, self).connect()
-        if self.is_connected():
-            self.channel.queue_declare(queue=self.queue_name, exclusive=False)
-            self.channel.queue_bind(exchange=self.exchange, queue=self.queue_name, routing_key=self.routing_key)
+        self.channel.queue_declare(queue=self.queue_name, exclusive=False)
+        self.channel.queue_bind(exchange=self.exchange, queue=self.queue_name, routing_key=self.routing_key)
 
     def _yield_get(self, inactivity_timeout=1):
         if self.quit is True:
-            yield None
             return
         for message in self.channel.consume(self.queue_name, inactivity_timeout=inactivity_timeout):
-            if message is None:
-                yield None
-                continue
-            method, properties, body = message
             if self.quit is True:
-                self.channel.basic_ack(delivery_tag=method.delivery_tag)
-                yield None
                 return
-            else:
-                yield message
-                self.channel.basic_ack(delivery_tag=method.delivery_tag)
+            if message is None:
+                continue
+            yield message
+            method, properties, body = message
+            self.channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def block_receive(self):
         Log.info("MessageQueue block_receive thread started (queue:%s)", self.queue_name)
-        try:
-            while self.quit is False:
-                try:
-                    self.connect()
-                    for message in self._yield_get():
-                        if message is not None and self._on_receive is not None:
-                            method, properties, body = message
-                            self._on_receive(json.loads(body), method.routing_key)
-                except KeyboardInterrupt:
-                    Log.info("MessageQueue block_receive thread got keyboard interrupt(queue:%s)", self.queue_name)
-                    self.quit = True
-                except:
-                    Log.info("Exception", exc_info=1)
-                    Log.info("sleeping 2 secs on queue connection failure")
-                    sleep(2)
-                self.disconnect()
-        finally:
-            Log.info("MessageQueue block_receive thread exited (queue:%s)", self.queue_name)
+        while self.quit is False:
+            try:
+                self.connect()
+                for method, properties, body in self._yield_get():
+                    if self._on_receive is not None:
+                        self._on_receive(json.loads(body), method.routing_key)
+            except KeyboardInterrupt:
+                Log.info("MessageQueue block_receive thread got keyboard interrupt(queue:%s)", self.queue_name)
+                self.quit = True
+            except:
+                Log.info("Exception", exc_info=1)
+            Log.info("sleeping 2 secs on queue connection failure")
+            sleep(2)
+            self.disconnect()
+        Log.info("MessageQueue block_receive thread exited (queue:%s)", self.queue_name)
 
     def cleanup(self):
         try:
@@ -65,11 +55,14 @@ class Receiver(QueueBase):
             pass
 
 if __name__ == "__main__":
-    from config import queue_server, username, password
+    queue_server = "192.168.1.22"
+    username = "test"
+    password = "test"
+    exchange_and_routing_key = "events"
 
-    def on_receive(self, event_payload, routing_key):
-        pass
+    def on_receive(event_payload, routing_key):
+        print (str(event_payload))
 
-    r = Receiver(queue_server, username, password, "events", on_receive=on_receive, exchange="events",
-                 queue_name="Controller_controller1_receive_queue")
+    r = Receiver(queue_server, username, password, routing_key=exchange_and_routing_key, exchange="events",
+                 on_receive=on_receive, queue_name="Controller_controller1_receive_queue")
     r.block_receive()

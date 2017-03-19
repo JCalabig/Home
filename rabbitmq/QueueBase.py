@@ -9,9 +9,6 @@ class QueueBase(object):
         self._port = port
         self.username = username
         self.password = password
-        self.properties = pika.BasicProperties(content_type="application/json",
-                                               delivery_mode=2)  # 2 = persistent
-        self._params = None
         self._connection = None
         self.channel = None
         self.quit = False
@@ -26,10 +23,11 @@ class QueueBase(object):
             return
         self.disconnect()
         credentials = pika.PlainCredentials(self.username, self.password)
-        self._params = pika.ConnectionParameters(host=self._host, port=self._port, credentials=credentials)
-        self._connection = pika.BlockingConnection(self._params)
+        params = pika.ConnectionParameters(host=self._host, port=self._port, credentials=credentials)
+        # params.socket_timeout = 5
+        self._connection = pika.BlockingConnection(params)
         self.channel = self._connection.channel()
-        self.channel.confirm_delivery()
+        # self.channel.confirm_delivery()
         self.channel.exchange_declare(exchange=self.exchange, type='direct')
 
     def disconnect(self):
